@@ -13,7 +13,7 @@ namespace TizenMtgCounter
 		public App()
 		{
 			// The root page of your application
-			MainPage = new CirclePage
+			MainPage = new ContentPage
 			{
 				Content = new StackLayout
 				{
