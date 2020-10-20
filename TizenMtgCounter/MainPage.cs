@@ -3,6 +3,7 @@ using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
+using Xamarin.Forms.Shapes;
 
 namespace TizenMtgCounter
 {
@@ -24,17 +25,15 @@ namespace TizenMtgCounter
 				FontSize = 32,
 				HorizontalOptions = LayoutOptions.Center
 			};
-
-			Label minus = new Label
-			{
-				Text = "\u2212",
-				FontSize = 18,
-				HorizontalOptions = LayoutOptions.Center
-			};
-
 			Label plus = new Label
 			{
 				Text = "+",
+				FontSize = 18,
+				HorizontalOptions = LayoutOptions.Center
+			};
+			Label minus = new Label
+			{
+				Text = "\u2212",
 				FontSize = 18,
 				HorizontalOptions = LayoutOptions.Center
 			};
@@ -60,7 +59,6 @@ namespace TizenMtgCounter
 			Content = layout;
 
 			RotaryFocusObject = this;
-
 			resetTicks = new Timer
 			{
 				Interval = 500,
@@ -68,6 +66,16 @@ namespace TizenMtgCounter
 				AutoReset = false,
 			};
 			resetTicks.Elapsed += (sender, e) => ticks = 0;
+
+			Button button = new Button();
+
+			TapGestureRecognizer increment = new TapGestureRecognizer();
+			increment.Tapped += (sender, e) => Life++;
+			plus.GestureRecognizers.Add(increment);
+
+			TapGestureRecognizer decrement = new TapGestureRecognizer();
+			decrement.Tapped += (sender, e) => Life--;
+			minus.GestureRecognizers.Add(decrement);
 		}
 		public int Life
 		{
