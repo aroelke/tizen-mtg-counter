@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
@@ -25,17 +26,23 @@ namespace TizenMtgCounter
 				FontSize = 32,
 				HorizontalOptions = LayoutOptions.Center
 			};
-			Label plus = new Label
+			RepeatButton plusButton = new RepeatButton
 			{
 				Text = "+",
-				FontSize = 18,
-				HorizontalOptions = LayoutOptions.Center
+				BackgroundColor = Color.Transparent,
+				Delay = 500,
+				Interval = 100,
+				HorizontalOptions = LayoutOptions.Center,
+				WidthRequest = 60
 			};
-			Label minus = new Label
+			RepeatButton minusButton = new RepeatButton
 			{
 				Text = "\u2212",
-				FontSize = 18,
-				HorizontalOptions = LayoutOptions.Center
+				BackgroundColor = Color.Transparent,
+				Delay = 500,
+				Interval = 100,
+				HorizontalOptions = LayoutOptions.Center,
+				WidthRequest = 60
 			};
 
 			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
@@ -46,9 +53,9 @@ namespace TizenMtgCounter
 				HorizontalOptions = LayoutOptions.Center,
 				Spacing = -24,
 				Children = {
-					plus,
+					plusButton,
 					counter,
-					minus
+					minusButton
 				}
 			};
 			layout.Children.Add(
@@ -67,15 +74,10 @@ namespace TizenMtgCounter
 			};
 			resetTicks.Elapsed += (sender, e) => ticks = 0;
 
-			Button button = new Button();
-
-			TapGestureRecognizer increment = new TapGestureRecognizer();
-			increment.Tapped += (sender, e) => Life++;
-			plus.GestureRecognizers.Add(increment);
-
-			TapGestureRecognizer decrement = new TapGestureRecognizer();
-			decrement.Tapped += (sender, e) => Life--;
-			minus.GestureRecognizers.Add(decrement);
+			plusButton.Pressed += (sender, e) => Life++;
+			plusButton.Held += (sender, e) => Life++;
+			minusButton.Pressed += (sender, e) => Life--;
+			minusButton.Held += (sender, e) => Life--;
 		}
 		public int Life
 		{
@@ -91,10 +93,8 @@ namespace TizenMtgCounter
 
 				counter.TextColor = Color.White;
 				foreach (int threshold in thresholds)
-				{
 					if (life <= threshold)
 						counter.TextColor = ColorThresholds[threshold];
-				}
 			}
 		}
 
