@@ -8,26 +8,21 @@ namespace TizenMtgCounter
 {
 	public class MainPage : BezelInteractionPage, IRotaryEventReceiver
 	{
-		public const int TICK_THRESHOLD = 5;
-
 		private int life;
 		private int ticks;
 		private readonly Label label;
 		private readonly Timer resetTicks;
-		private readonly IDictionary<int, Color> colors;
 
-		public MainPage(int start, IDictionary<int, Color> thresholds) : base()
+		public MainPage() : base()
 		{
-			life = start;
+			life = 0;
 			ticks = 0;
-			colors = thresholds;
 
 			label = new Label
 			{
-				Text = start.ToString(),
+				Text = life.ToString(),
 				FontSize = 32
 			};
-			setLabelColor();
 
 			resetTicks = new Timer
 			{
@@ -48,22 +43,32 @@ namespace TizenMtgCounter
 
 			RotaryFocusObject = this;
 		}
-
-		public MainPage(int start) : this(start, new Dictionary<int, Color>()) {}
-
-		private void setLabelColor()
+		public int Life
 		{
-			var thresholds = colors.Keys.ToList();
-			thresholds.Sort();
-			thresholds.Reverse();
-
-			label.TextColor = Color.White;
-			foreach (int threshold in thresholds)
+			get { return life; }
+			set
 			{
-				if (life <= threshold)
-					label.TextColor = colors[threshold];
+				life = value;
+				label.Text = life.ToString();
+
+				var thresholds = ColorThresholds.Keys.ToList();
+				thresholds.Sort();
+				thresholds.Reverse();
+
+				label.TextColor = Color.White;
+				foreach (int threshold in thresholds)
+				{
+					if (life <= threshold)
+						label.TextColor = ColorThresholds[threshold];
+				}
 			}
 		}
+
+		public int TickThreshold { get; set; } = 10;
+
+		public int FastTickStep { get; set; } = 5;
+
+		public IDictionary<int, Color> ColorThresholds { get; set; } = new Dictionary<int, Color>();
 
 		public void Rotate(RotaryEventArgs args)
 		{
@@ -73,10 +78,10 @@ namespace TizenMtgCounter
 					ticks++;
 				else
 					ticks = 1;
-				if (ticks <= TICK_THRESHOLD)
-					life++;
+				if (ticks <= TickThreshold)
+					Life++;
 				else
-					life += TICK_THRESHOLD;
+					Life += FastTickStep;
 			}
 			else
 			{
@@ -84,13 +89,11 @@ namespace TizenMtgCounter
 					ticks--;
 				else
 					ticks = -1;
-				if (ticks >= -TICK_THRESHOLD)
-					life--;
+				if (ticks >= -TickThreshold)
+					Life--;
 				else
-					life -= TICK_THRESHOLD;
+					Life -= FastTickStep;
 			}
-			label.Text = life.ToString();
-			setLabelColor();
 
 			resetTicks.Stop();
 			resetTicks.Start();

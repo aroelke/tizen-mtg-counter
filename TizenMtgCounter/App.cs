@@ -14,11 +14,15 @@ namespace TizenMtgCounter
 		public App()
 		{
 			// The root page of your application
-			MainPage = new MainPage(20, new Dictionary<int, Color>
+			MainPage = new MainPage
 			{
-				{5, Color.Red},
-				{10, Color.Orange}
-			});
+				Life = 20,
+				ColorThresholds = new Dictionary<int, Color>
+				{
+					{5, Color.Red},
+					{10, Color.Orange}
+				}
+			};
 		}
 
 		protected override void OnStart()
