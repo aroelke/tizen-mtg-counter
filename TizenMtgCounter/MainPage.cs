@@ -10,7 +10,7 @@ namespace TizenMtgCounter
 	{
 		private int life;
 		private int ticks;
-		private readonly Label label;
+		private readonly Label counter;
 		private readonly Timer resetTicks;
 
 		public MainPage() : base()
@@ -18,11 +18,48 @@ namespace TizenMtgCounter
 			life = 0;
 			ticks = 0;
 
-			label = new Label
+			counter = new Label
 			{
 				Text = life.ToString(),
-				FontSize = 32
+				FontSize = 32,
+				HorizontalOptions = LayoutOptions.Center
 			};
+
+			Label minus = new Label
+			{
+				Text = "\u2212",
+				FontSize = 18,
+				HorizontalOptions = LayoutOptions.Center
+			};
+
+			Label plus = new Label
+			{
+				Text = "+",
+				FontSize = 18,
+				HorizontalOptions = LayoutOptions.Center
+			};
+
+			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
+			RelativeLayout layout = new RelativeLayout();
+			StackLayout counterLayout = new StackLayout
+			{
+				VerticalOptions = LayoutOptions.Center,
+				HorizontalOptions = LayoutOptions.Center,
+				Spacing = -24,
+				Children = {
+					plus,
+					counter,
+					minus
+				}
+			};
+			layout.Children.Add(
+				counterLayout,
+				Constraint.RelativeToParent((p) => (p.Width - getSize(counterLayout).Width)/2),
+				Constraint.RelativeToParent((p) => (p.Height - getSize(counterLayout).Height)/2)
+			);
+			Content = layout;
+
+			RotaryFocusObject = this;
 
 			resetTicks = new Timer
 			{
@@ -31,17 +68,6 @@ namespace TizenMtgCounter
 				AutoReset = false,
 			};
 			resetTicks.Elapsed += (sender, e) => ticks = 0;
-
-			Content = new StackLayout
-			{
-				HorizontalOptions = LayoutOptions.Center,
-				VerticalOptions = LayoutOptions.Center,
-				Children = {
-					label
-				}
-			};
-
-			RotaryFocusObject = this;
 		}
 		public int Life
 		{
@@ -49,17 +75,17 @@ namespace TizenMtgCounter
 			set
 			{
 				life = value;
-				label.Text = life.ToString();
+				counter.Text = life.ToString();
 
 				var thresholds = ColorThresholds.Keys.ToList();
 				thresholds.Sort();
 				thresholds.Reverse();
 
-				label.TextColor = Color.White;
+				counter.TextColor = Color.White;
 				foreach (int threshold in thresholds)
 				{
 					if (life <= threshold)
-						label.TextColor = ColorThresholds[threshold];
+						counter.TextColor = ColorThresholds[threshold];
 				}
 			}
 		}
