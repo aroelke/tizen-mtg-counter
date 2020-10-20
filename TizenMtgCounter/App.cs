@@ -13,7 +13,7 @@ namespace TizenMtgCounter
 		public App()
 		{
 			// The root page of your application
-			MainPage = new MainPage();
+			MainPage = new MainPage(20);
 		}
 
 		protected override void OnStart()

@@ -13,14 +13,14 @@ namespace TizenMtgCounter
 		private Label label;
 		private Timer resetThreshold;
 
-		public MainPage()
+		public MainPage(int start)
 		{
-			life = 0;
+			life = start;
 			ticks = 0;
 
 			label = new Label
 			{
-				Text = "0",
+				Text = start.ToString(),
 				FontSize = 32
 			};
 
