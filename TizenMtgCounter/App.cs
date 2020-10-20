@@ -5,6 +5,7 @@ using System.Text;
 
 using Xamarin.Forms;
 using Tizen.Wearable.CircularUI.Forms;
+using System.Collections.Immutable;
 
 namespace TizenMtgCounter
 {
@@ -13,7 +14,11 @@ namespace TizenMtgCounter
 		public App()
 		{
 			// The root page of your application
-			MainPage = new MainPage(20);
+			MainPage = new MainPage(20, new Dictionary<int, Color>
+			{
+				{5, Color.Red},
+				{10, Color.Orange}
+			});
 		}
 
 		protected override void OnStart()
