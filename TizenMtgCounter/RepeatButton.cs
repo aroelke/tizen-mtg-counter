@@ -7,7 +7,7 @@ using Xamarin.Forms;
 
 namespace TizenMtgCounter
 {
-	class RepeatButton : Button
+	public class RepeatButton : Button
 	{
 		private readonly Timer timer;
 

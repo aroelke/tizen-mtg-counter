@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
+using Tizen.Wearable.CircularUI.Forms.Renderer;
 using Tizen.WebView;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Tizen;
@@ -16,7 +17,7 @@ namespace TizenMtgCounter
 		private int life;
 		private int poison;
 		private int ticks;
-		private readonly Label lifeCounter;
+		private readonly CounterPopupEntry lifeCounter;
 		private readonly Label poisonCounter;
 		private readonly Timer resetTicks;
 
@@ -26,11 +27,13 @@ namespace TizenMtgCounter
 			poison = 0;
 			ticks = 0;
 
-			lifeCounter = new Label
+			lifeCounter = new CounterPopupEntry
 			{
 				Text = life.ToString(),
 				FontSize = 32,
-				HorizontalOptions = LayoutOptions.Center
+				Keyboard = Keyboard.Numeric,
+				BackgroundColor = Color.Transparent,
+				HorizontalTextAlignment = TextAlignment.Center
 			};
 			RepeatButton plusButton = new RepeatButton
 			{
@@ -104,6 +107,12 @@ namespace TizenMtgCounter
 			};
 			resetTicks.Elapsed += (sender, e) => ticks = 0;
 
+			lifeCounter.Completed += (sender, e) => {
+				if (int.TryParse(lifeCounter.Text, out int result))
+					Life = result;
+				else
+					Life = Life;
+			};
 			plusButton.Pressed += (sender, e) => Life++;
 			plusButton.Held += (sender, e) => Life++;
 			minusButton.Pressed += (sender, e) => Life--;
