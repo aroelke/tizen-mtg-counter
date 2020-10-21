@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
+using Tizen.WebView;
 using Xamarin.Forms;
-using Xamarin.Forms.Shapes;
+using Xamarin.Forms.Platform.Tizen;
+using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
+using Label = Xamarin.Forms.Label;
 
 namespace TizenMtgCounter
 {
@@ -29,21 +31,21 @@ namespace TizenMtgCounter
 			RepeatButton plusButton = new RepeatButton
 			{
 				Text = "+",
-				BackgroundColor = Color.Transparent,
 				Delay = 500,
 				Interval = 100,
 				HorizontalOptions = LayoutOptions.Center,
 				WidthRequest = 60
 			};
+			plusButton.On<Xamarin.Forms.PlatformConfiguration.Tizen>().SetStyle(ButtonStyle.Text);
 			RepeatButton minusButton = new RepeatButton
 			{
 				Text = "\u2212",
-				BackgroundColor = Color.Transparent,
 				Delay = 500,
 				Interval = 100,
 				HorizontalOptions = LayoutOptions.Center,
 				WidthRequest = 60
 			};
+			minusButton.On<Xamarin.Forms.PlatformConfiguration.Tizen>().SetStyle(ButtonStyle.Text);
 
 			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
 			RelativeLayout layout = new RelativeLayout();
