@@ -14,6 +14,8 @@ namespace TizenMtgCounter
 {
 	public class MainPage : BezelInteractionPage, IRotaryEventReceiver
 	{
+		private readonly Color POISON_HEALTHY = Color.Gray;
+
 		private int life;
 		private int poison;
 		private int ticks;
@@ -65,7 +67,7 @@ namespace TizenMtgCounter
 			{
 				Text = poison.ToString(),
 				FontSize = 10,
-				TextColor = Color.Gray
+				TextColor = POISON_HEALTHY
 			};
 
 			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
@@ -139,26 +141,29 @@ namespace TizenMtgCounter
 			}
 		}
 
-		public int Poison
-		{
-			get { return poison;  }
-			set
-			{
-				poison = value;
-				poisonCounter.Text = poison.ToString();
-
-				if (poison >= 10)
-					poisonCounter.TextColor = Color.Red;
-				else
-					poisonCounter.TextColor = Color.Gray;
-			}
-		}
-
 		public int TickThreshold { get; set; } = 10;
 
 		public int FastTickStep { get; set; } = 5;
 
 		public IDictionary<int, Color> ColorThresholds { get; set; } = new Dictionary<int, Color>();
+
+		public int Poison
+		{
+			get { return poison; }
+			set
+			{
+				poison = value;
+				poisonCounter.Text = poison.ToString();
+
+				(int t, Color c) = PoisonThreshold;
+				if (poison >= t)
+					poisonCounter.TextColor = c;
+				else
+					poisonCounter.TextColor = POISON_HEALTHY;
+			}
+		}
+
+		public (int, Color) PoisonThreshold { get; set; } = (10, Color.Red);
 
 		public void Rotate(RotaryEventArgs args)
 		{
