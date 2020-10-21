@@ -14,16 +14,19 @@ namespace TizenMtgCounter
 	public class MainPage : BezelInteractionPage, IRotaryEventReceiver
 	{
 		private int life;
+		private int poison;
 		private int ticks;
-		private readonly Label counter;
+		private readonly Label lifeCounter;
+		private readonly Label poisonCounter;
 		private readonly Timer resetTicks;
 
 		public MainPage() : base()
 		{
 			life = 0;
+			poison = 0;
 			ticks = 0;
 
-			counter = new Label
+			lifeCounter = new Label
 			{
 				Text = life.ToString(),
 				FontSize = 32,
@@ -55,9 +58,9 @@ namespace TizenMtgCounter
 				HeightRequest = 60,
 				CornerRadius = 30
 			};
-			Label poisonCounter = new Label
+			poisonCounter = new Label
 			{
-				Text = "0",
+				Text = poison.ToString(),
 				FontSize = 10,
 				TextColor = Color.Gray
 			};
@@ -71,7 +74,7 @@ namespace TizenMtgCounter
 				Spacing = -24,
 				Children = {
 					plusButton,
-					counter,
+					lifeCounter,
 					minusButton
 				}
 			};
@@ -105,6 +108,8 @@ namespace TizenMtgCounter
 			plusButton.Held += (sender, e) => Life++;
 			minusButton.Pressed += (sender, e) => Life--;
 			minusButton.Held += (sender, e) => Life--;
+
+			poisonButton.Clicked += (sender, e) => Poison++;
 		}
 		public int Life
 		{
@@ -112,16 +117,31 @@ namespace TizenMtgCounter
 			set
 			{
 				life = value;
-				counter.Text = life.ToString();
+				lifeCounter.Text = life.ToString();
 
 				var thresholds = ColorThresholds.Keys.ToList();
 				thresholds.Sort();
 				thresholds.Reverse();
 
-				counter.TextColor = Color.White;
+				lifeCounter.TextColor = Color.Default;
 				foreach (int threshold in thresholds)
 					if (life <= threshold)
-						counter.TextColor = ColorThresholds[threshold];
+						lifeCounter.TextColor = ColorThresholds[threshold];
+			}
+		}
+
+		public int Poison
+		{
+			get { return poison;  }
+			set
+			{
+				poison = value;
+				poisonCounter.Text = poison.ToString();
+
+				if (poison >= 10)
+					poisonCounter.TextColor = Color.Red;
+				else
+					poisonCounter.TextColor = Color.Gray;
 			}
 		}
 
