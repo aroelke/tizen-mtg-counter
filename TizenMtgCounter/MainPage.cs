@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
-using Tizen.Wearable.CircularUI.Forms.Renderer;
-using Tizen.WebView;
 using Xamarin.Forms;
-using Xamarin.Forms.Platform.Tizen;
 using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
 using Label = Xamarin.Forms.Label;
 
