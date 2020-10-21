@@ -155,15 +155,14 @@ namespace TizenMtgCounter
 				poison = value;
 				poisonCounter.Text = poison.ToString();
 
-				(int t, Color c) = PoisonThreshold;
-				if (poison >= t)
-					poisonCounter.TextColor = c;
+				if (poison >= PoisonThreshold.Threshold)
+					poisonCounter.TextColor = PoisonThreshold.Color;
 				else
 					poisonCounter.TextColor = POISON_HEALTHY;
 			}
 		}
 
-		public (int, Color) PoisonThreshold { get; set; } = (10, Color.Red);
+		public (int Threshold, Color Color) PoisonThreshold { get; set; } = (10, Color.Red);
 
 		public void Rotate(RotaryEventArgs args)
 		{
