@@ -59,14 +59,14 @@ namespace TizenMtgCounter
 			ImageButton poisonButton = new ImageButton
 			{
 				Source = "poison.png", // Image by reptiletc
-				WidthRequest = 60,
-				HeightRequest = 60,
-				CornerRadius = 30
+				WidthRequest = 70,
+				HeightRequest = 70,
+				CornerRadius = 35
 			};
 			poisonCounter = new Label
 			{
 				Text = poison.ToString(),
-				FontSize = 10,
+				FontSize = 8,
 				TextColor = POISON_HEALTHY
 			};
 
@@ -89,14 +89,14 @@ namespace TizenMtgCounter
 				Constraint.RelativeToParent((p) => (p.Height - getSize(counterLayout).Height)/2)
 			);
 			layout.Children.Add(
-				poisonButton,
-				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 1)/2),
-				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 1)/2)
-			);
-			layout.Children.Add(
 				poisonCounter,
 				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 3)/2 - getSize(poisonCounter).Width/2),
 				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 3)/2 - getSize(poisonCounter).Height/2)
+			);
+			layout.Children.Add(
+				poisonButton,
+				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 1)/2),
+				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 1)/2)
 			);
 			Content = layout;
 
