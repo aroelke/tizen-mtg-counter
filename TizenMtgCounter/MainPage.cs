@@ -127,14 +127,14 @@ namespace TizenMtgCounter
 				life = value;
 				lifeCounter.Text = life.ToString();
 
-				var thresholds = ColorThresholds.Keys.ToList();
-				thresholds.Sort();
-				thresholds.Reverse();
-
-				lifeCounter.TextColor = Color.Default;
-				foreach (int threshold in thresholds)
+				foreach ((int threshold, Color color) in LifeThresholds)
+				{
 					if (life <= threshold)
-						lifeCounter.TextColor = ColorThresholds[threshold];
+					{
+						lifeCounter.TextColor = color;
+						break;
+					}
+				}
 			}
 		}
 
@@ -142,7 +142,7 @@ namespace TizenMtgCounter
 
 		public int FastTickStep { get; set; } = 5;
 
-		public IDictionary<int, Color> ColorThresholds { get; set; } = new Dictionary<int, Color>();
+		public IList<(int, Color)> LifeThresholds { get; set; } = new List<(int, Color)>();
 
 		public int Poison
 		{

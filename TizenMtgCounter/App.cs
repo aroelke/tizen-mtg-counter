@@ -11,11 +11,7 @@ namespace TizenMtgCounter
 			MainPage = new MainPage
 			{
 				Life = 20,
-				ColorThresholds = new Dictionary<int, Color>
-				{
-					{5, Color.Red},
-					{10, Color.Orange}
-				}
+				LifeThresholds = { (5, Color.Red), (10, Color.Orange) }
 			};
 		}
 
