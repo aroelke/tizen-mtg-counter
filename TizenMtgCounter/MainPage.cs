@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
@@ -67,7 +68,7 @@ namespace TizenMtgCounter
 			};
 
 			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
-			AbsoluteLayout layout = new AbsoluteLayout();
+			RelativeLayout layout = new RelativeLayout();
 			StackLayout counterLayout = new StackLayout
 			{
 				VerticalOptions = LayoutOptions.Center,
@@ -79,17 +80,21 @@ namespace TizenMtgCounter
 					minusButton
 				}
 			};
-			layout.Children.Add(counterLayout, new Point { X = (Width - getSize(counterLayout).Width)/2 , Y = (Height - getSize(counterLayout).Height)/2 });
-			layout.Children.Add(poisonCounter, new Point 
-			{
-				X = Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 3)/2 - getSize(poisonCounter).Width/2,
-				Y = Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 3)/2 - getSize(poisonCounter).Height/2
-			});
-			layout.Children.Add(poisonButton, new Point
-			{ 
-				X = Width/2 * (1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 1)/2 ,
-				Y = Height/2 * (1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 1)/2
-			});
+			layout.Children.Add(
+				counterLayout,
+				Constraint.RelativeToParent((p) => (p.Width - getSize(counterLayout).Width)/2),
+				Constraint.RelativeToParent((p) => (p.Height - getSize(counterLayout).Height)/2)
+			);
+			layout.Children.Add(
+				poisonCounter,
+				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 3)/2 - getSize(poisonCounter).Width/2),
+				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 3)/2 - getSize(poisonCounter).Height/2)
+			);
+			layout.Children.Add(
+				poisonButton,
+				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 1)/2),
+				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 1)/2)
+			);
 			Content = layout;
 
 			RotaryFocusObject = this;
@@ -122,16 +127,14 @@ namespace TizenMtgCounter
 				life = value;
 				lifeCounter.Text = life.ToString();
 
-				Color selected = Color.Default;
 				foreach ((int threshold, Color color) in LifeThresholds)
 				{
 					if (life <= threshold)
 					{
-						selected = color;
+						lifeCounter.TextColor = color;
 						break;
 					}
 				}
-				lifeCounter.TextColor = selected;
 			}
 		}
 
