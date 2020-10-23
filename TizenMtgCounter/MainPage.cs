@@ -112,10 +112,10 @@ namespace TizenMtgCounter
 				else
 					Life = Life;
 			};
-			plusButton.Pressed += (sender, e) => Life++;
-			plusButton.Held += (sender, e) => Life++;
-			minusButton.Pressed += (sender, e) => Life--;
-			minusButton.Held += (sender, e) => Life--;
+			plusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Life++);
+			plusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Life++);
+			minusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Life--);
+			minusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Life--);
 
 			poisonButton.Clicked += (sender, e) => Poison++;
 		}
@@ -127,14 +127,16 @@ namespace TizenMtgCounter
 				life = value;
 				lifeCounter.Text = life.ToString();
 
+				Color target = Color.Default;
 				foreach ((int threshold, Color color) in LifeThresholds)
 				{
 					if (life <= threshold)
 					{
-						lifeCounter.TextColor = color;
+						target = color;
 						break;
 					}
 				}
+				lifeCounter.TextColor = target;
 			}
 		}
 

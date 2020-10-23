@@ -6,11 +6,9 @@ namespace TizenMtgCounter
 {
 	public class RepeatButton : Button
 	{
-		private readonly Timer timer;
-
 		public RepeatButton() : base()
 		{
-			timer = new Timer
+			Timer timer = new Timer
 			{
 				Enabled = false,
 				AutoReset = true
