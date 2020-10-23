@@ -9,7 +9,14 @@ namespace TizenMtgCounter
 		{
 			base.OnCreate();
 
-			LoadApplication(new App());
+			LoadApplication(new Application
+			{
+				MainPage = new MainPage
+				{
+					Life = 20,
+					LifeThresholds = { (5, Color.Red), (10, Color.Orange) }
+				}
+			});
 		}
 
 		static void Main(string[] args)
