@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
@@ -11,10 +10,8 @@ namespace TizenMtgCounter
 {
 	public class MainPage : BezelInteractionPage, IRotaryEventReceiver
 	{
-		private readonly Color POISON_HEALTHY = Color.Gray;
-
-		private int life;
-		private int poison;
+		private readonly CounterData<int> life;
+		private readonly CounterData<int> poison;
 		private int ticks;
 		private readonly CounterPopupEntry lifeCounter;
 		private readonly Label poisonCounter;
@@ -22,14 +19,15 @@ namespace TizenMtgCounter
 
 		public MainPage() : base()
 		{
-			life = 0;
-			poison = 0;
+			life = new CounterData<int> { Value = 0 };
+			poison = new CounterData<int> { Value = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }};
 			ticks = 0;
 
 			lifeCounter = new CounterPopupEntry
 			{
-				Text = life.ToString(),
+				Text = life.Value.ToString(),
 				FontSize = 32,
+				TextColor = life.GetTextColor(),
 				Keyboard = Keyboard.Numeric,
 				BackgroundColor = Color.Transparent,
 				HorizontalTextAlignment = TextAlignment.Center
@@ -62,9 +60,9 @@ namespace TizenMtgCounter
 			};
 			poisonCounter = new Label
 			{
-				Text = poison.ToString(),
+				Text = poison.Value.ToString(),
 				FontSize = 8,
-				TextColor = POISON_HEALTHY
+				TextColor = poison.GetTextColor()
 			};
 
 			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
@@ -121,22 +119,12 @@ namespace TizenMtgCounter
 		}
 		public int Life
 		{
-			get { return life; }
+			get => life.Value;
 			set
 			{
-				life = value;
-				lifeCounter.Text = life.ToString();
-
-				Color target = Color.Default;
-				foreach ((int threshold, Color color) in LifeThresholds)
-				{
-					if (life <= threshold)
-					{
-						target = color;
-						break;
-					}
-				}
-				lifeCounter.TextColor = target;
+				life.Value = value;
+				lifeCounter.Text = life.Value.ToString();
+				lifeCounter.TextColor = life.GetTextColor();
 			}
 		}
 
@@ -144,24 +132,28 @@ namespace TizenMtgCounter
 
 		public int FastTickStep { get; set; } = 5;
 
-		public IList<(int, Color)> LifeThresholds { get; set; } = new List<(int, Color)>();
+		public IList<(int, Color)> LifeThresholds
+		{
+			get => life.Thresholds;
+			set => life.Thresholds = value;
+		}
 
 		public int Poison
 		{
-			get { return poison; }
+			get => poison.Value;
 			set
 			{
-				poison = value;
-				poisonCounter.Text = poison.ToString();
-
-				if (poison >= PoisonThreshold.Threshold)
-					poisonCounter.TextColor = PoisonThreshold.Color;
-				else
-					poisonCounter.TextColor = POISON_HEALTHY;
+				poison.Value = value;
+				poisonCounter.Text = poison.Value.ToString();
+				poisonCounter.TextColor = poison.GetTextColor();
 			}
 		}
 
-		public (int Threshold, Color Color) PoisonThreshold { get; set; } = (10, Color.Red);
+		public (int Threshold, Color Color) PoisonThreshold
+		{
+			get => poison.Thresholds[0];
+			set => poison.Thresholds[0] = value;
+		}
 
 		public void Rotate(RotaryEventArgs args)
 		{
