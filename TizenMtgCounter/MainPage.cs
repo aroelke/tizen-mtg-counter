@@ -11,8 +11,10 @@ namespace TizenMtgCounter
 {
 	public class MainPage : BezelInteractionPage, IRotaryEventReceiver
 	{
-		private readonly CounterData<int> life;
-		private readonly CounterData<int> poison;
+		private const int LIFE = 1;
+		private const int POISON = 2;
+		private Counter<int> counter;
+
 		private int ticks;
 		private bool maximized;
 		private readonly CounterPopupEntry lifeCounter;
@@ -22,16 +24,22 @@ namespace TizenMtgCounter
 
 		public MainPage() : base()
 		{
-			life = new CounterData<int> { Value = 0 };
-			poison = new CounterData<int> { Value = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }};
+			counter = new Counter<int> {
+				Data = {
+					{LIFE, new CounterData<int> { Value = 0 }},
+					{POISON, new CounterData<int> { Value = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }}}
+				},
+				Focus = LIFE
+			};
+
 			ticks = 0;
 			maximized = false;
 
 			lifeCounter = new CounterPopupEntry
 			{
-				Text = life.Value.ToString(),
+				Text = counter[LIFE].ToString(),
 				FontSize = 32,
-				TextColor = life.GetTextColor(),
+				TextColor = counter.GetTextColor(LIFE),
 				Keyboard = Keyboard.Numeric,
 				BackgroundColor = Color.Transparent,
 				HorizontalTextAlignment = TextAlignment.Center
@@ -63,14 +71,14 @@ namespace TizenMtgCounter
 				CornerRadius = 35
 			};
 			poisonCounter = new Label {
-				Text = poison.Value.ToString(),
+				Text = counter[POISON].ToString(),
 				FontSize = 8,
-				TextColor = poison.GetTextColor()
+				TextColor = counter.GetTextColor(POISON)
 			};
 			poisonEntry = new CounterPopupEntry {
-				Text = life.Value.ToString(),
+				Text = counter[POISON].ToString(),
 				FontSize = 32,
-				TextColor = life.GetTextColor(),
+				TextColor = counter.GetTextColor(POISON),
 				Keyboard = Keyboard.Numeric,
 				BackgroundColor = Color.Transparent,
 				HorizontalTextAlignment = TextAlignment.Center,
@@ -163,12 +171,12 @@ namespace TizenMtgCounter
 		}
 		public int Life
 		{
-			get => life.Value;
+			get => counter[LIFE];
 			set
 			{
-				life.Value = value;
-				lifeCounter.Text = life.Value.ToString();
-				lifeCounter.TextColor = life.GetTextColor();
+				counter[LIFE] = value;
+				lifeCounter.Text = counter[LIFE].ToString();
+				lifeCounter.TextColor = counter.GetTextColor(LIFE);
 			}
 		}
 
@@ -178,25 +186,25 @@ namespace TizenMtgCounter
 
 		public IList<(int, Color)> LifeThresholds
 		{
-			get => life.Thresholds;
-			set => life.Thresholds = value;
+			get => counter.Data[LIFE].Thresholds;
+			set => counter.Data[LIFE].Thresholds = value;
 		}
 
 		public int Poison
 		{
-			get => poison.Value;
+			get => counter[POISON];
 			set
 			{
-				poison.Value = value;
-				poisonCounter.Text = poisonEntry.Text = poison.Value.ToString();
-				poisonCounter.TextColor = poisonEntry.TextColor = poison.GetTextColor();
+				counter[POISON] = value;
+				poisonCounter.Text = poisonEntry.Text = counter[POISON].ToString();
+				poisonCounter.TextColor = poisonEntry.TextColor = counter.GetTextColor(POISON);
 			}
 		}
 
 		public (int Threshold, Color Color) PoisonThreshold
 		{
-			get => poison.Thresholds[0];
-			set => poison.Thresholds[0] = value;
+			get => counter.Data[POISON].Thresholds[0];
+			set => counter.Data[POISON].Thresholds[0] = value;
 		}
 
 		private void Increment(int value)
