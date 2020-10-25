@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
+using Xamarin.Forms.Platform.Tizen;
 using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
 using Label = Xamarin.Forms.Label;
 
@@ -13,7 +14,9 @@ namespace TizenMtgCounter
 		private readonly CounterData<int> life;
 		private readonly CounterData<int> poison;
 		private int ticks;
+		private bool maximized;
 		private readonly CounterPopupEntry lifeCounter;
+		private readonly CounterPopupEntry poisonEntry;
 		private readonly Label poisonCounter;
 		private readonly Timer resetTicks;
 
@@ -22,6 +25,7 @@ namespace TizenMtgCounter
 			life = new CounterData<int> { Value = 0 };
 			poison = new CounterData<int> { Value = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }};
 			ticks = 0;
+			maximized = false;
 
 			lifeCounter = new CounterPopupEntry
 			{
@@ -58,11 +62,19 @@ namespace TizenMtgCounter
 				HeightRequest = 70,
 				CornerRadius = 35
 			};
-			poisonCounter = new Label
-			{
+			poisonCounter = new Label {
 				Text = poison.Value.ToString(),
 				FontSize = 8,
 				TextColor = poison.GetTextColor()
+			};
+			poisonEntry = new CounterPopupEntry {
+				Text = life.Value.ToString(),
+				FontSize = 32,
+				TextColor = life.GetTextColor(),
+				Keyboard = Keyboard.Numeric,
+				BackgroundColor = Color.Transparent,
+				HorizontalTextAlignment = TextAlignment.Center,
+				IsVisible = false
 			};
 
 			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
@@ -75,6 +87,7 @@ namespace TizenMtgCounter
 				Children = {
 					plusButton,
 					lifeCounter,
+					poisonEntry,
 					minusButton
 				}
 			};
@@ -110,12 +123,43 @@ namespace TizenMtgCounter
 				else
 					Life = Life;
 			};
-			plusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Life++);
-			plusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Life++);
-			minusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Life--);
-			minusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Life--);
+			plusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Increment(1));
+			plusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Increment(1));
+			minusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Increment(-1));
+			minusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Increment(-1));
 
-			poisonButton.Clicked += (sender, e) => Poison++;
+			bool maximize = false;
+			Timer maximizeTimer = new Timer {
+				Interval = 500,
+				Enabled = false,
+				AutoReset = false
+			};
+			maximizeTimer.Elapsed += (sender, e) => {
+				maximize = maximized = true;
+				Device.BeginInvokeOnMainThread(() => {
+					lifeCounter.IsVisible = poisonCounter.IsVisible = false;
+					poisonEntry.IsVisible = true;
+				});
+			};
+			poisonButton.Pressed += (sender, e) => {
+				if (!maximized)
+					maximizeTimer.Start();
+			};
+			poisonButton.Released += (sender, e) => {
+				maximizeTimer.Stop();
+				if (!maximize)
+				{
+					if (maximized)
+					{
+						maximized = false;
+						lifeCounter.IsVisible = poisonCounter.IsVisible = true;
+						poisonEntry.IsVisible = false;
+					}
+					else
+						Poison++;
+				}
+				maximize = false;
+			};
 		}
 		public int Life
 		{
@@ -144,8 +188,8 @@ namespace TizenMtgCounter
 			set
 			{
 				poison.Value = value;
-				poisonCounter.Text = poison.Value.ToString();
-				poisonCounter.TextColor = poison.GetTextColor();
+				poisonCounter.Text = poisonEntry.Text = poison.Value.ToString();
+				poisonCounter.TextColor = poisonEntry.TextColor = poison.GetTextColor();
 			}
 		}
 
@@ -153,6 +197,14 @@ namespace TizenMtgCounter
 		{
 			get => poison.Thresholds[0];
 			set => poison.Thresholds[0] = value;
+		}
+
+		private void Increment(int value)
+		{
+			if (maximized)
+				Poison += value;
+			else
+				Life += value;
 		}
 
 		public void Rotate(RotaryEventArgs args)
@@ -164,9 +216,9 @@ namespace TizenMtgCounter
 				else
 					ticks = 1;
 				if (ticks <= TickThreshold)
-					Life++;
+					Increment(1);
 				else
-					Life += FastTickStep;
+					Increment(FastTickStep);
 			}
 			else
 			{
@@ -175,9 +227,9 @@ namespace TizenMtgCounter
 				else
 					ticks = -1;
 				if (ticks >= -TickThreshold)
-					Life--;
+					Increment(-1);
 				else
-					Life -= FastTickStep;
+					Increment(-FastTickStep);
 			}
 
 			resetTicks.Stop();
