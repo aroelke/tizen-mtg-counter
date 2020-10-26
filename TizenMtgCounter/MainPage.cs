@@ -78,10 +78,12 @@ namespace TizenMtgCounter
 				});
 			};
 			poisonButton.Pressed += (sender, e) => {
+				poisonButton.Source = "poison_pressed.png";
 				if (!maximized)
 					maximizeTimer.Start();
 			};
 			poisonButton.Released += (sender, e) => {
+				poisonButton.Source = "poison.png";
 				maximizeTimer.Stop();
 				if (!maximize)
 				{
