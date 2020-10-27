@@ -88,10 +88,14 @@ namespace TizenMtgCounter
 					entry.TextColor = Color.Transparent;
 
 				Labels = value.Select((p) => new KeyValuePair<K, Label>(p.Key, new Label {
-					Text = value[p.Key].Value.ToString(),
-					FontSize = 8,
-					TextColor = GetTextColor(p.Key)
+					FontSize = 8
 				})).ToDictionary((p) => p.Key, (p) => p.Value);
+				foreach (K key in data.Keys)
+				{
+					Labels[key].SetBinding(Label.TextProperty, "Value");
+					Labels[key].SetBinding(Label.TextColorProperty, "TextColor");
+					Labels[key].BindingContext = value[key];
+				}
 			}
 		}
 
@@ -119,9 +123,9 @@ namespace TizenMtgCounter
 
 		public int FastTickStep { get; set; } = 5;
 
-		public CounterReference<K> this[K key]
+		public int this[K key]
 		{
-			get => new CounterReference<K>(Data[key].Value, key, this);
+			get => Data[key].Value;
 			set
 			{
 				Data[key].Value = value;
@@ -171,31 +175,6 @@ namespace TizenMtgCounter
 				resetTicks.Stop();
 				resetTicks.Start();
 			}
-		}
-	}
-
-	public readonly struct CounterReference<K>
-	{
-		public static CounterReference<K> operator +(CounterReference<K> o, int i) => new CounterReference<K>(o.n + i, o.key, o.counter);
-		public static CounterReference<K> operator ++(CounterReference<K> o) => o + 1;
-		public static CounterReference<K> operator -(CounterReference<K> o, int i) => o + -i;
-		public static CounterReference<K> operator --(CounterReference<K> o) => o - 1;
-
-		public static implicit operator int(CounterReference<K> r) => r.n;
-		public static implicit operator CounterReference<K>(int i) => new CounterReference<K>(i, default, default);
-
-		private readonly int n;
-		private readonly K key;
-		private readonly Counter<K> counter;
-
-		public CounterReference(int i, K k, Counter<K> c)
-		{
-			n = i;
-			key = k;
-			counter = c;
-
-			if (!EqualityComparer<Counter<K>>.Default.Equals(c, default))
-				c[k] = this;
 		}
 	}
 }
