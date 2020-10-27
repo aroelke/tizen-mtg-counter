@@ -1,14 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
+using Entry = Xamarin.Forms.Entry;
 using Label = Xamarin.Forms.Label;
 
 namespace TizenMtgCounter
 {
-	public class Counter<K> : IRotaryEventReceiver
+	public class Counter<K> : IRotaryEventReceiver, INotifyPropertyChanged
 	{
 		private IDictionary<K, CounterData<int>> data;
 		private K selected;
@@ -16,16 +19,14 @@ namespace TizenMtgCounter
 		private readonly CounterPopupEntry entry;
 		private readonly Timer resetTicks;
 
-		public Counter() : base()
+		public Counter()
 		{
 			data = new Dictionary<K, CounterData<int>>();
 			selected = default;
 			ticks = 0;
 
 			entry = new CounterPopupEntry {
-				Text = "",
 				FontSize = 32,
-				TextColor = Color.Transparent,
 				Keyboard = Keyboard.Numeric,
 				BackgroundColor = Color.Transparent,
 				HorizontalTextAlignment = TextAlignment.Center
@@ -54,15 +55,18 @@ namespace TizenMtgCounter
 			};
 			resetTicks.Elapsed += (sender, e) => ticks = 0;
 
+			entry.SetBinding(Entry.TextProperty, "Value");
+			entry.SetBinding(Entry.TextColorProperty, "TextColor");
+			entry.BindingContext = this;
 			entry.Completed += (sender, e) => {
-				if (!EqualityComparer<K>.Default.Equals(selected, default) && int.TryParse(entry.Text, out int result))
-					this[selected] = result;
+				if (int.TryParse(entry.Text, out int result))
+					Value = result;
 			};
 
-			plusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => { if (!EqualityComparer<K>.Default.Equals(selected, default)) this[Selected]++; });
-			plusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => { if (!EqualityComparer<K>.Default.Equals(selected, default)) this[Selected]++; });
-			minusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => { if (!EqualityComparer<K>.Default.Equals(selected, default)) this[Selected]--; });
-			minusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => { if (!EqualityComparer<K>.Default.Equals(selected, default)) this[Selected]--; });
+			plusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Value++);
+			plusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Value++);
+			minusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Value--);
+			minusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Value--);
 
 			Content = new StackLayout {
 				HorizontalOptions = LayoutOptions.Center,
@@ -79,19 +83,13 @@ namespace TizenMtgCounter
 			{
 				data = value;
 
-				if (data.ContainsKey(selected))
+				Labels = value.Select((p) => new KeyValuePair<K, Label>(p.Key, new Label { FontSize = 8 })).ToDictionary((p) => p.Key, (p) => p.Value);
+				foreach (K key in data.Keys)
 				{
-					entry.Text = this[selected].ToString();
-					entry.TextColor = GetTextColor(selected);
+					Labels[key].SetBinding(Label.TextProperty, "Value");
+					Labels[key].SetBinding(Label.TextColorProperty, "TextColor");
+					Labels[key].BindingContext = value[key];
 				}
-				else
-					entry.TextColor = Color.Transparent;
-
-				Labels = value.Select((p) => new KeyValuePair<K, Label>(p.Key, new Label {
-					Text = value[p.Key].Value.ToString(),
-					FontSize = 8,
-					TextColor = GetTextColor(p.Key)
-				})).ToDictionary((p) => p.Key, (p) => p.Value);
 			}
 		}
 
@@ -103,15 +101,26 @@ namespace TizenMtgCounter
 			set
 			{
 				selected = value;
-				if (EqualityComparer<K>.Default.Equals(value, default))
-					entry.TextColor = Color.Transparent;
-				else
+				OnPropertyChanged("Value");
+				OnPropertyChanged("TextColor");
+			}
+		}
+
+		public int Value
+		{
+			get => data.ContainsKey(selected) ? data[selected].Value : default;
+			set
+			{
+				if (data.ContainsKey(selected))
 				{
-					entry.Text = this[value].ToString();
-					entry.TextColor = GetTextColor(value);
+					data[selected].Value = value;
+					OnPropertyChanged();
+					OnPropertyChanged("TextColor");
 				}
 			}
 		}
+
+		public Color TextColor { get => data.ContainsKey(selected) ? data[selected].TextColor : Color.Transparent; }
 
 		public View Content { get; private set; }
 
@@ -119,28 +128,18 @@ namespace TizenMtgCounter
 
 		public int FastTickStep { get; set; } = 5;
 
-		public CounterReference<K> this[K key]
+		public int this[K key]
 		{
-			get => new CounterReference<K>(Data[key].Value, key, this);
+			get => Data[key].Value;
 			set
 			{
 				Data[key].Value = value;
-				Labels[key].Text = value.ToString();
-				Labels[key].TextColor = GetTextColor(key);
-				if (EqualityComparer<K>.Default.Equals(selected, key))
+				if (EqualityComparer<K>.Default.Equals(key, selected))
 				{
-					entry.Text = value.ToString();
-					entry.TextColor = GetTextColor(selected);
+					OnPropertyChanged("Value");
+					OnPropertyChanged("TextColor");
 				}
 			}
-		}
-
-		public Color GetTextColor(K key)
-		{
-			foreach ((int threshold, Color color) in data[key].Thresholds)
-				if (data[key].Value <= threshold)
-					return color;
-			return Color.Default;
 		}
 
 		public void Rotate(RotaryEventArgs args)
@@ -154,9 +153,9 @@ namespace TizenMtgCounter
 					else
 						ticks = 1;
 					if (ticks <= TickThreshold)
-						this[selected]++;
+						Value++;
 					else
-						this[selected] += FastTickStep;
+						Value += FastTickStep;
 				}
 				else
 				{
@@ -165,41 +164,21 @@ namespace TizenMtgCounter
 					else
 						ticks = -1;
 					if (ticks >= -TickThreshold)
-						this[selected]--;
+						Value--;
 					else
-						this[selected] -= FastTickStep;
+						Value -= FastTickStep;
 				}
 
 				resetTicks.Stop();
 				resetTicks.Start();
 			}
 		}
-	}
 
-	public readonly struct CounterReference<K>
-	{
-		public static CounterReference<K> operator +(CounterReference<K> o, int i) => new CounterReference<K>(o.n + i, o.key, o.counter);
-		public static CounterReference<K> operator ++(CounterReference<K> o) => o + 1;
-		public static CounterReference<K> operator -(CounterReference<K> o, int i) => o + -i;
-		public static CounterReference<K> operator --(CounterReference<K> o) => o - 1;
-
-		public static implicit operator int(CounterReference<K> r) => r.n;
-		public static implicit operator CounterReference<K>(int i) => new CounterReference<K>(i, default, default);
-
-		private readonly int n;
-		private readonly K key;
-		private readonly Counter<K> counter;
-
-		public CounterReference(int i, K k, Counter<K> c)
+		protected void OnPropertyChanged([CallerMemberName] string name = null)
 		{
-			n = i;
-			key = k;
-			counter = c;
-
-			if (!EqualityComparer<Counter<K>>.Default.Equals(c, default))
-				c[k] = this;
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
 
-		public override string ToString() => n.ToString();
+		public event PropertyChangedEventHandler PropertyChanged;
 	}
 }
