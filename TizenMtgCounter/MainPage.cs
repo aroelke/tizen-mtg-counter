@@ -19,7 +19,7 @@ namespace TizenMtgCounter
 		public MainPage() : base()
 		{
 			counter = new Counter<int> {
-				Data = {
+				Data = new Dictionary<int, CounterData<int>>() {
 					{ LIFE, new CounterData<int> { Value = 20, Thresholds = { (5, Color.Red), (10, Color.Orange) }}},
 					{ POISON, new CounterData<int> { Value = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }}}
 				},
