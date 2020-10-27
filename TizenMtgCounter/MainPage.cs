@@ -14,9 +14,7 @@ namespace TizenMtgCounter
 		private const int LIFE = 1;
 		private const int POISON = 2;
 		private readonly Counter<int> counter;
-
 		private bool maximized;
-		private readonly Label poisonCounter;
 
 		public MainPage() : base()
 		{
@@ -37,11 +35,6 @@ namespace TizenMtgCounter
 				HeightRequest = 70,
 				CornerRadius = 35
 			};
-			poisonCounter = new Label {
-				Text = counter[POISON].ToString(),
-				FontSize = 8,
-				TextColor = counter.GetTextColor(POISON)
-			};
 
 			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
 			RelativeLayout layout = new RelativeLayout();
@@ -51,9 +44,9 @@ namespace TizenMtgCounter
 				Constraint.RelativeToParent((p) => (p.Height - getSize(counter.Content).Height)/2)
 			);
 			layout.Children.Add(
-				poisonCounter,
-				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 3)/2 - getSize(poisonCounter).Width/2),
-				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 3)/2 - getSize(poisonCounter).Height/2)
+				counter.Labels[POISON],
+				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 3)/2 - getSize(counter.Labels[POISON]).Width/2),
+				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 3)/2 - getSize(counter.Labels[POISON]).Height/2)
 			);
 			layout.Children.Add(
 				poisonButton,
@@ -74,7 +67,7 @@ namespace TizenMtgCounter
 				maximize = maximized = true;
 				Device.BeginInvokeOnMainThread(() => {
 					counter.Selected = POISON;
-					poisonCounter.IsVisible = false;
+					counter.Labels[POISON].IsVisible = false;
 				});
 			};
 			poisonButton.Pressed += (sender, e) => {
@@ -91,16 +84,10 @@ namespace TizenMtgCounter
 					{
 						maximized = false;
 						counter.Selected = LIFE;
-						poisonCounter.Text = counter[POISON].ToString();
-						poisonCounter.TextColor = counter.GetTextColor(POISON);
-						poisonCounter.IsVisible = true;
+						counter.Labels[POISON].IsVisible = true;
 					}
 					else
-					{
 						counter[POISON]++;
-						poisonCounter.Text = counter[POISON].ToString();
-						poisonCounter.TextColor = counter.GetTextColor(POISON);
-					}
 				}
 				maximize = false;
 			};

@@ -1,23 +1,25 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
+using Label = Xamarin.Forms.Label;
 
 namespace TizenMtgCounter
 {
-	class Counter<K> : IRotaryEventReceiver
+	public class Counter<K> : IRotaryEventReceiver
 	{
 		private IDictionary<K, CounterData<int>> data;
 		private K selected;
 		private int ticks;
-		private readonly StackLayout content;
 		private readonly CounterPopupEntry entry;
 		private readonly Timer resetTicks;
 
 		public Counter() : base()
 		{
 			data = new Dictionary<K, CounterData<int>>();
+			Labels = new Dictionary<K, Label>();
 			selected = default;
 			ticks = 0;
 
@@ -63,7 +65,7 @@ namespace TizenMtgCounter
 			minusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => { if (!EqualityComparer<K>.Default.Equals(selected, default)) this[Selected]--; });
 			minusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => { if (!EqualityComparer<K>.Default.Equals(selected, default)) this[Selected]--; });
 
-			content = new StackLayout {
+			Content = new StackLayout {
 				HorizontalOptions = LayoutOptions.Center,
 				VerticalOptions = LayoutOptions.Center,
 				Spacing = -24,
@@ -77,6 +79,7 @@ namespace TizenMtgCounter
 			set
 			{
 				data = value;
+
 				if (data.ContainsKey(selected))
 				{
 					entry.Text = this[selected].ToString();
@@ -84,8 +87,16 @@ namespace TizenMtgCounter
 				}
 				else
 					entry.TextColor = Color.Transparent;
+
+				Labels = value.Select((p) => new KeyValuePair<K, Label>(p.Key, new Label {
+					Text = value[p.Key].Value.ToString(),
+					FontSize = 8,
+					TextColor = value[p.Key].GetTextColor()
+				})).ToDictionary((p) => p.Key, (p) => p.Value);
 			}
 		}
+
+		public IDictionary<K, Label> Labels { get; private set; }
 
 		public K Selected
 		{
@@ -103,15 +114,15 @@ namespace TizenMtgCounter
 			}
 		}
 
-		public View Content { get => content; }
+		public View Content { get; private set; }
 
 		public int TickThreshold { get; set; } = 10;
 
 		public int FastTickStep { get; set; } = 5;
 
-		public int this[K key]
+		public CounterReference<K> this[K key]
 		{
-			get => Data[key].Value;
+			get => new CounterReference<K>(Data[key].Value, key, this);
 			set
 			{
 				Data[key].Value = value;
@@ -166,6 +177,31 @@ namespace TizenMtgCounter
 				resetTicks.Stop();
 				resetTicks.Start();
 			}
+		}
+	}
+
+	public readonly struct CounterReference<K>
+	{
+		public static CounterReference<K> operator +(CounterReference<K> o, int i) => new CounterReference<K>(o.n + i, o.key, o.counter);
+		public static CounterReference<K> operator ++(CounterReference<K> o) => o + 1;
+		public static CounterReference<K> operator -(CounterReference<K> o, int i) => o + -i;
+		public static CounterReference<K> operator --(CounterReference<K> o) => o - 1;
+
+		public static implicit operator int(CounterReference<K> r) => r.n;
+		public static implicit operator CounterReference<K>(int i) => new CounterReference<K>(i, default, default);
+
+		private readonly int n;
+		private readonly K key;
+		private readonly Counter<K> counter;
+
+		public CounterReference(int i, K k, Counter<K> c)
+		{
+			n = i;
+			key = k;
+			counter = c;
+
+			if (!EqualityComparer<Counter<K>>.Default.Equals(c, default))
+				c[k] = this;
 		}
 	}
 }
