@@ -125,6 +125,8 @@ namespace TizenMtgCounter
 			set
 			{
 				Data[key].Value = value;
+				Labels[key].Text = value.ToString();
+				Labels[key].TextColor = GetTextColor(key);
 				if (EqualityComparer<K>.Default.Equals(selected, key))
 				{
 					entry.Text = value.ToString();
@@ -197,5 +199,7 @@ namespace TizenMtgCounter
 			if (!EqualityComparer<Counter<K>>.Default.Equals(c, default))
 				c[k] = this;
 		}
+
+		public override string ToString() => n.ToString();
 	}
 }
