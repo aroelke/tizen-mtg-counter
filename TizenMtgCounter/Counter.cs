@@ -19,7 +19,6 @@ namespace TizenMtgCounter
 		public Counter() : base()
 		{
 			data = new Dictionary<K, CounterData<int>>();
-			Labels = new Dictionary<K, Label>();
 			selected = default;
 			ticks = 0;
 
@@ -83,7 +82,7 @@ namespace TizenMtgCounter
 				if (data.ContainsKey(selected))
 				{
 					entry.Text = this[selected].ToString();
-					entry.TextColor = GetTextColor();
+					entry.TextColor = GetTextColor(selected);
 				}
 				else
 					entry.TextColor = Color.Transparent;
@@ -91,12 +90,12 @@ namespace TizenMtgCounter
 				Labels = value.Select((p) => new KeyValuePair<K, Label>(p.Key, new Label {
 					Text = value[p.Key].Value.ToString(),
 					FontSize = 8,
-					TextColor = value[p.Key].GetTextColor()
+					TextColor = GetTextColor(p.Key)
 				})).ToDictionary((p) => p.Key, (p) => p.Value);
 			}
 		}
 
-		public IDictionary<K, Label> Labels { get; private set; }
+		public IDictionary<K, Label> Labels { get; private set; } = new Dictionary<K, Label>();
 
 		public K Selected
 		{
@@ -109,7 +108,7 @@ namespace TizenMtgCounter
 				else
 				{
 					entry.Text = this[value].ToString();
-					entry.TextColor = GetTextColor();
+					entry.TextColor = GetTextColor(value);
 				}
 			}
 		}
@@ -129,22 +128,17 @@ namespace TizenMtgCounter
 				if (EqualityComparer<K>.Default.Equals(selected, key))
 				{
 					entry.Text = value.ToString();
-					entry.TextColor = GetTextColor();
+					entry.TextColor = GetTextColor(selected);
 				}
 			}
 		}
 
-		public Color GetTextColor()
-		{
-			if (EqualityComparer<K>.Default.Equals(selected, default))
-				return Color.Transparent;
-			else
-				return GetTextColor(selected);
-		}
-
 		public Color GetTextColor(K key)
 		{
-			return Data[key].GetTextColor();
+			foreach ((int threshold, Color color) in data[key].Thresholds)
+				if (data[key].Value <= threshold)
+					return color;
+			return Color.Default;
 		}
 
 		public void Rotate(RotaryEventArgs args)
