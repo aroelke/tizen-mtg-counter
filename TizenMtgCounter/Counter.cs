@@ -24,7 +24,7 @@ namespace TizenMtgCounter
 
 			entry = new CounterPopupEntry {
 				Text = "",
-				FontSize = 32,
+				FontSize = 8,
 				TextColor = Color.Transparent,
 				Keyboard = Keyboard.Numeric,
 				BackgroundColor = Color.Transparent,
@@ -54,6 +54,9 @@ namespace TizenMtgCounter
 			};
 			resetTicks.Elapsed += (sender, e) => ticks = 0;
 
+			entry.SetBinding(CounterPopupEntry.TextProperty, "Value");
+			entry.SetBinding(CounterPopupEntry.TextColorProperty, "TextColor");
+			entry.BindingContext = this;
 			entry.Completed += (sender, e) => {
 				if (!EqualityComparer<K>.Default.Equals(selected, default) && int.TryParse(entry.Text, out int result))
 					this[selected] = result;
@@ -82,7 +85,7 @@ namespace TizenMtgCounter
 				if (data.ContainsKey(selected))
 				{
 					entry.Text = this[selected].ToString();
-					entry.TextColor = GetTextColor(selected);
+					entry.TextColor = TextColor;
 				}
 				else
 					entry.TextColor = Color.Transparent;
@@ -107,15 +110,12 @@ namespace TizenMtgCounter
 			set
 			{
 				selected = value;
-				if (EqualityComparer<K>.Default.Equals(value, default))
-					entry.TextColor = Color.Transparent;
-				else
-				{
-					entry.Text = this[value].ToString();
-					entry.TextColor = GetTextColor(value);
-				}
 			}
 		}
+
+		public int Value { get => data.ContainsKey(selected) ? data[selected].Value : default; }
+
+		public Color TextColor { get => data.ContainsKey(selected) ? data[selected].TextColor : Color.Transparent; }
 
 		public View Content { get; private set; }
 
@@ -129,20 +129,7 @@ namespace TizenMtgCounter
 			set
 			{
 				Data[key].Value = value;
-				if (EqualityComparer<K>.Default.Equals(selected, key))
-				{
-					entry.Text = value.ToString();
-					entry.TextColor = GetTextColor(selected);
-				}
 			}
-		}
-
-		public Color GetTextColor(K key)
-		{
-			foreach ((int threshold, Color color) in data[key].Thresholds)
-				if (data[key].Value <= threshold)
-					return color;
-			return Color.Default;
 		}
 
 		public void Rotate(RotaryEventArgs args)
