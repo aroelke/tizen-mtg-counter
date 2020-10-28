@@ -11,7 +11,7 @@ using Label = Xamarin.Forms.Label;
 
 namespace TizenMtgCounter
 {
-	public class Counter<K> : IRotaryEventReceiver, INotifyPropertyChanged
+	public class Counter<K> : IRotaryEventReceiver
 	{
 		private IDictionary<K, CounterData<int>> data;
 		private K selected;
@@ -57,9 +57,6 @@ namespace TizenMtgCounter
 			};
 			resetTicks.Elapsed += (sender, e) => ticks = 0;
 
-			entry.SetBinding(Entry.TextProperty, "Value");
-			entry.SetBinding(Entry.TextColorProperty, "TextColor");
-			entry.BindingContext = this;
 			entry.Completed += (sender, e) => {
 				if (int.TryParse(entry.Text, out int result))
 					Value = result;
@@ -92,7 +89,7 @@ namespace TizenMtgCounter
 					Labels[key].SetBinding(Label.TextColorProperty, "TextColor");
 					Labels[key].BindingContext = value[key];
 				}
-				plusButton.IsVisible = minusButton.IsVisible = data.ContainsKey(selected);
+				plusButton.IsVisible = minusButton.IsVisible = SelectedValid();
 			}
 		}
 
@@ -105,26 +102,26 @@ namespace TizenMtgCounter
 			{
 				selected = value;
 				plusButton.IsVisible = minusButton.IsVisible = !EqualityComparer<K>.Default.Equals(value, default);
-				OnPropertyChanged("Value");
-				OnPropertyChanged("TextColor");
+				entry.Text = Value.ToString();
+				entry.TextColor = TextColor;
 			}
 		}
 
 		public int Value
 		{
-			get => data.ContainsKey(selected) ? data[selected].Value : default;
+			get => SelectedValid() ? data[selected].Value : default;
 			set
 			{
-				if (data.ContainsKey(selected))
+				if (SelectedValid())
 				{
 					data[selected].Value = value;
-					OnPropertyChanged();
-					OnPropertyChanged("TextColor");
+					entry.Text = value.ToString();
+					entry.TextColor = TextColor;
 				}
 			}
 		}
 
-		public Color TextColor { get => data.ContainsKey(selected) ? data[selected].TextColor : Color.Transparent; }
+		public Color TextColor { get => SelectedValid() ? data[selected].TextColor : Color.Transparent; }
 
 		public View Content { get; private set; }
 
@@ -140,11 +137,13 @@ namespace TizenMtgCounter
 				Data[key].Value = value;
 				if (EqualityComparer<K>.Default.Equals(key, selected))
 				{
-					OnPropertyChanged("Value");
-					OnPropertyChanged("TextColor");
+					entry.Text = Value.ToString();
+					entry.TextColor = TextColor;
 				}
 			}
 		}
+
+		public bool SelectedValid() => !EqualityComparer<K>.Default.Equals(selected, default) && data.ContainsKey(selected);
 
 		public void Rotate(RotaryEventArgs args)
 		{
@@ -177,12 +176,5 @@ namespace TizenMtgCounter
 				resetTicks.Start();
 			}
 		}
-
-		protected void OnPropertyChanged([CallerMemberName] string name = null)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
-
-		public event PropertyChangedEventHandler PropertyChanged;
 	}
 }
