@@ -17,6 +17,8 @@ namespace TizenMtgCounter
 		private K selected;
 		private int ticks;
 		private readonly CounterPopupEntry entry;
+		private readonly RepeatButton plusButton;
+		private readonly RepeatButton minusButton;
 		private readonly Timer resetTicks;
 
 		public Counter()
@@ -31,7 +33,7 @@ namespace TizenMtgCounter
 				BackgroundColor = Color.Transparent,
 				HorizontalTextAlignment = TextAlignment.Center
 			};
-			RepeatButton plusButton = new RepeatButton {
+			plusButton = new RepeatButton {
 				Text = "+",
 				Delay = 500,
 				Interval = 100,
@@ -39,7 +41,7 @@ namespace TizenMtgCounter
 				WidthRequest = 60
 			};
 			plusButton.On<Xamarin.Forms.PlatformConfiguration.Tizen>().SetStyle(ButtonStyle.Text);
-			RepeatButton minusButton = new RepeatButton {
+			minusButton = new RepeatButton {
 				Text = "\u2212",
 				Delay = 500,
 				Interval = 100,
@@ -90,6 +92,7 @@ namespace TizenMtgCounter
 					Labels[key].SetBinding(Label.TextColorProperty, "TextColor");
 					Labels[key].BindingContext = value[key];
 				}
+				plusButton.IsVisible = minusButton.IsVisible = data.ContainsKey(selected);
 			}
 		}
 
@@ -101,6 +104,7 @@ namespace TizenMtgCounter
 			set
 			{
 				selected = value;
+				plusButton.IsVisible = minusButton.IsVisible = !EqualityComparer<K>.Default.Equals(value, default);
 				OnPropertyChanged("Value");
 				OnPropertyChanged("TextColor");
 			}
