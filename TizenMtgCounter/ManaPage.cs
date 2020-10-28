@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
 
@@ -53,18 +54,32 @@ namespace TizenMtgCounter
 
 			foreach (ManaType t in ManaType.Values)
 			{
-				buttons[t].Clicked += (sender, e) => {
-					if (counter.Selected == t)
+				Timer timer = new Timer {
+					Interval = 500,
+					Enabled = false,
+					AutoReset = false
+				};
+				timer.Elapsed += (sender, e) => Device.BeginInvokeOnMainThread(() => counter[t] = 0);
+
+				buttons[t].Pressed += (sender, e) => timer.Start();
+
+				buttons[t].Released += (sender, e) => {
+					if (timer.Enabled)
 					{
-						counter.Selected = null;
-						counter.Labels[t].IsVisible = true;
-					}
-					else
-					{
-						if (counter.SelectedValid())
-							counter.Labels[counter.Selected].IsVisible = true;
-						counter.Selected = t;
-						counter.Labels[t].IsVisible = false;
+						timer.Stop();
+
+						if (counter.Selected == t)
+						{
+							counter.Selected = null;
+							counter.Labels[t].IsVisible = true;
+						}
+						else
+						{
+							if (counter.SelectedValid())
+								counter.Labels[counter.Selected].IsVisible = true;
+							counter.Selected = t;
+							counter.Labels[t].IsVisible = false;
+						}
 					}
 				};
 			}
