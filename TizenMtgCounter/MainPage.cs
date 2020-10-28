@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
-using Xamarin.Forms.Platform.Tizen;
-using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
-using Label = Xamarin.Forms.Label;
 
 namespace TizenMtgCounter
 {
@@ -13,20 +10,18 @@ namespace TizenMtgCounter
 	{
 		private const int LIFE = 1;
 		private const int POISON = 2;
-		private readonly Counter<int> counter;
-		private bool maximized;
 
 		public MainPage() : base()
 		{
-			counter = new Counter<int> {
+			Counter<int> counter = new Counter<int> {
 				Data = new Dictionary<int, CounterData<int>>() {
-					{ LIFE, new CounterData<int> { Value = 20, Thresholds = { (5, Color.Red), (10, Color.Orange) }}},
-					{ POISON, new CounterData<int> { Value = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }}}
+					[LIFE] = new CounterData<int> { Value = 20, Thresholds = { (5, Color.Red), (10, Color.Orange) }},
+					[POISON] = new CounterData<int> { Value = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }}
 				},
 				Selected = LIFE
 			};
 
-			maximized = false;
+			bool maximized = false;
 
 			ImageButton poisonButton = new ImageButton
 			{
