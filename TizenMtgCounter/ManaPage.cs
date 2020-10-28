@@ -61,9 +61,13 @@ namespace TizenMtgCounter
 				};
 				timer.Elapsed += (sender, e) => Device.BeginInvokeOnMainThread(() => counter[t] = 0);
 
-				buttons[t].Pressed += (sender, e) => timer.Start();
+				buttons[t].Pressed += (sender, e) => {
+					buttons[t].Opacity = 1.0/3.0;
+					timer.Start();
+				};
 
 				buttons[t].Released += (sender, e) => {
+					buttons[t].Opacity = 1;
 					if (timer.Enabled)
 					{
 						timer.Stop();
