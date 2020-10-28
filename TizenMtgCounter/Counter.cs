@@ -89,7 +89,7 @@ namespace TizenMtgCounter
 					Labels[key].SetBinding(Label.TextColorProperty, "TextColor");
 					Labels[key].BindingContext = value[key];
 				}
-				plusButton.IsVisible = minusButton.IsVisible = SelectedValid();
+				entry.IsVisible = plusButton.IsVisible = minusButton.IsVisible = SelectedValid();
 			}
 		}
 
@@ -101,7 +101,7 @@ namespace TizenMtgCounter
 			set
 			{
 				selected = value;
-				plusButton.IsVisible = minusButton.IsVisible = !EqualityComparer<K>.Default.Equals(value, default);
+				entry.IsVisible = plusButton.IsVisible = minusButton.IsVisible = !EqualityComparer<K>.Default.Equals(value, default);
 				entry.Text = Value.ToString();
 				entry.TextColor = TextColor;
 			}
