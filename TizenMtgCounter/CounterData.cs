@@ -6,11 +6,11 @@ using Xamarin.Forms;
 
 namespace TizenMtgCounter
 {
-	public class CounterData<T> : INotifyPropertyChanged where T : IComparable<T>
+	public class CounterData : INotifyPropertyChanged
 	{
-		private T val = default;
+		private int val = 0;
 
-		public T Value {
+		public int Value {
 			get => val;
 			set
 			{
@@ -20,13 +20,16 @@ namespace TizenMtgCounter
 			}
 		}
 
-		public IList<(T, Color)> Thresholds { get; set; } = new List<(T, Color)>();
+		public int Minimum { get; set; } = int.MinValue;
+		public int Maximum { get; set; } = int.MaxValue;
+
+		public IList<(int, Color)> Thresholds { get; set; } = new List<(int, Color)>();
 		public Color TextColor
 		{
 			get
 			{
-				foreach ((T threshold, Color color) in Thresholds)
-					if (val.CompareTo(threshold) <= 0)
+				foreach ((int threshold, Color color) in Thresholds)
+					if (val <= threshold)
 						return color;
 				return Color.Default;
 			}

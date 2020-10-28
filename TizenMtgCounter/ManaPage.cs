@@ -12,13 +12,13 @@ namespace TizenMtgCounter
 
 		public ManaPage() : base()
 		{
-			Counter<ManaType> counter = new Counter<ManaType> { Data = new Dictionary<ManaType, CounterData<int>> {
-				[ManaType.Colorless] = new CounterData<int> { Value = 0 },
-				[ManaType.White] = new CounterData<int> { Value = 0 },
-				[ManaType.Blue] = new CounterData<int> { Value = 0 },
-				[ManaType.Black] = new CounterData<int> { Value = 0 },
-				[ManaType.Red] = new CounterData<int> { Value = 0 },
-				[ManaType.Green] = new CounterData<int> { Value = 0 }
+			Counter<ManaType> counter = new Counter<ManaType> { Data = new Dictionary<ManaType, CounterData> {
+				[ManaType.Colorless] = new CounterData { Value = 0 },
+				[ManaType.White] = new CounterData { Value = 0 },
+				[ManaType.Blue] = new CounterData { Value = 0 },
+				[ManaType.Black] = new CounterData { Value = 0 },
+				[ManaType.Red] = new CounterData { Value = 0 },
+				[ManaType.Green] = new CounterData { Value = 0 }
 			}};
 
 			IDictionary<ManaType, ImageButton> buttons = ManaType.Values.ToDictionary(

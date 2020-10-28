@@ -13,7 +13,7 @@ namespace TizenMtgCounter
 {
 	public class Counter<K> : IRotaryEventReceiver
 	{
-		private IDictionary<K, CounterData<int>> data;
+		private IDictionary<K, CounterData> data;
 		private K selected;
 		private int ticks;
 		private readonly CounterPopupEntry entry;
@@ -23,7 +23,7 @@ namespace TizenMtgCounter
 
 		public Counter()
 		{
-			data = new Dictionary<K, CounterData<int>>();
+			data = new Dictionary<K, CounterData>();
 			selected = default;
 			ticks = 0;
 
@@ -75,7 +75,7 @@ namespace TizenMtgCounter
 			};
 		}
 
-		public IDictionary<K, CounterData<int>> Data
+		public IDictionary<K, CounterData> Data
 		{
 			get => data;
 			set
