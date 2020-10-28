@@ -16,7 +16,7 @@ namespace TizenMtgCounter
 			Counter<int> counter = new Counter<int> {
 				Data = new Dictionary<int, CounterData>() {
 					[LIFE] = new CounterData { Value = 20, Thresholds = { (5, Color.Red), (10, Color.Orange) }},
-					[POISON] = new CounterData { Value = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }}
+					[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }}
 				},
 				Selected = LIFE
 			};

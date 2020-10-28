@@ -14,7 +14,7 @@ namespace TizenMtgCounter
 			get => val;
 			set
 			{
-				val = value;
+				val = Math.Clamp(value, Minimum, Maximum);
 				OnPropertyChanged();
 				OnPropertyChanged("TextColor");
 			}

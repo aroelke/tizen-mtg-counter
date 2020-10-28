@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
-using Entry = Xamarin.Forms.Entry;
 using Label = Xamarin.Forms.Label;
 
 namespace TizenMtgCounter
@@ -115,7 +112,7 @@ namespace TizenMtgCounter
 				if (SelectedValid())
 				{
 					data[selected].Value = value;
-					entry.Text = value.ToString();
+					entry.Text = data[selected].Value.ToString();
 					entry.TextColor = TextColor;
 				}
 			}
