@@ -7,7 +7,9 @@ namespace TizenMtgCounter
 		protected override void OnCreate()
 		{
 			base.OnCreate();
-			LoadApplication(new Application { MainPage = new ManaPage() });
+			LoadApplication(new Application { MainPage = new NavigationPage(new MainPage(
+				new ManaPage()
+			)) });
 		}
 
 		static void Main(string[] args)

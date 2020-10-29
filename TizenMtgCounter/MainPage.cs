@@ -11,8 +11,10 @@ namespace TizenMtgCounter
 		private const int LIFE = 1;
 		private const int POISON = 2;
 
-		public MainPage() : base()
+		public MainPage(ManaPage mana) : base()
 		{
+			NavigationPage.SetHasNavigationBar(this, false);
+
 			Counter<int> counter = new Counter<int> {
 				Data = new Dictionary<int, CounterData>() {
 					[LIFE] = new CounterData { Value = 20, Thresholds = { (5, Color.Red), (10, Color.Orange) }},
@@ -31,6 +33,13 @@ namespace TizenMtgCounter
 				CornerRadius = 35
 			};
 
+			ImageButton manaPageButton = new ImageButton {
+				Source = "mana.png",
+				WidthRequest = 60,
+				HeightRequest = 60,
+				CornerRadius = 30
+			};
+
 			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
 			RelativeLayout layout = new RelativeLayout();
 			layout.Children.Add(
@@ -47,6 +56,11 @@ namespace TizenMtgCounter
 				poisonButton,
 				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 1)/2),
 				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 1)/2)
+			);
+			layout.Children.Add(
+				manaPageButton,
+				Constraint.RelativeToParent((p) => p.Width - getSize(manaPageButton).Width),
+				Constraint.RelativeToParent((p) => (p.Height - getSize(manaPageButton).Height)/2)
 			);
 			Content = layout;
 
@@ -86,6 +100,10 @@ namespace TizenMtgCounter
 				}
 				maximize = false;
 			};
+
+			manaPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(mana, true);
+			manaPageButton.Pressed += (sender, e) => manaPageButton.Opacity = 1.0/3.0;
+			manaPageButton.Released += (sender, e) => manaPageButton.Opacity = 1;
 		}
 	}
 }

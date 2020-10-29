@@ -7,12 +7,14 @@ using Xamarin.Forms;
 
 namespace TizenMtgCounter
 {
-	class ManaPage : BezelInteractionPage
+	public class ManaPage : BezelInteractionPage
 	{
 		private const int ButtonSize = 60;
 
 		public ManaPage() : base()
 		{
+			NavigationPage.SetHasNavigationBar(this, false);
+
 			Counter<ManaType> counter = new Counter<ManaType> { Data = ManaType.Values.ToDictionary((m) => m, (m) => new CounterData { Value = 0, Minimum = 0 }) };
 
 			IDictionary<ManaType, ImageButton> buttons = ManaType.Values.ToDictionary(
