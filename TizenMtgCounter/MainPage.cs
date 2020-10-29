@@ -11,13 +11,13 @@ namespace TizenMtgCounter
 		private const int LIFE = 1;
 		private const int POISON = 2;
 
-		public MainPage(ManaPage mana) : base()
+		public MainPage(ManaPage mana, HistoryPage history) : base()
 		{
 			NavigationPage.SetHasNavigationBar(this, false);
 
 			Counter<int> counter = new Counter<int> {
 				Data = new Dictionary<int, CounterData>() {
-					[LIFE] = new CounterData { Value = 20, Thresholds = { (5, Color.Red), (10, Color.Orange) }},
+					[LIFE] = new CounterData { Value = history.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) }},
 					[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }}
 				},
 				Selected = LIFE
@@ -38,6 +38,12 @@ namespace TizenMtgCounter
 				WidthRequest = 60,
 				HeightRequest = 60,
 				CornerRadius = 30
+			};
+
+			ImageButton historyPageButton = new ImageButton {
+				Source = "history.png", // Icon made by Freepik from www.flaticon.com
+				WidthRequest = 45,
+				HeightRequest = 45
 			};
 
 			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
@@ -62,9 +68,18 @@ namespace TizenMtgCounter
 				Constraint.RelativeToParent((p) => p.Width - getSize(manaPageButton).Width),
 				Constraint.RelativeToParent((p) => (p.Height - getSize(manaPageButton).Height)/2)
 			);
+			layout.Children.Add(
+				historyPageButton,
+				Constraint.RelativeToParent((p) => (p.Width - getSize(historyPageButton).Width)/2),
+				Constraint.Constant(7.5)
+			);
 			Content = layout;
-
 			RotaryFocusObject = counter;
+
+			counter.ValueChanged += (sender, e) => {
+				if (e is CounterChangedEventArgs<int> args && args.Key == LIFE)
+					history.AddChange(args.NewValue - args.OldValue);
+			};
 
 			bool maximize = false;
 			Timer maximizeTimer = new Timer {
@@ -101,9 +116,20 @@ namespace TizenMtgCounter
 				maximize = false;
 			};
 
+			history.Reset += (sender, e) => {
+				counter[LIFE] = history.StartingLife;
+				counter[POISON] = 0;
+				mana.Clear();
+				history.Clear(); // Must come after resetting life counter so it doesn't record it
+			};
+
 			manaPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(mana, true);
 			manaPageButton.Pressed += (sender, e) => manaPageButton.Opacity = 1.0/3.0;
 			manaPageButton.Released += (sender, e) => manaPageButton.Opacity = 1;
+
+			historyPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(history, true);
+			historyPageButton.Pressed += (sender, e) => historyPageButton.Opacity = 1.0/3.0;
+			historyPageButton.Released += (sender, e) => historyPageButton.Opacity = 1;
 		}
 	}
 }

@@ -11,11 +11,13 @@ namespace TizenMtgCounter
 	{
 		private const int ButtonSize = 60;
 
+		private readonly Counter<ManaType> counter;
+
 		public ManaPage() : base()
 		{
 			NavigationPage.SetHasNavigationBar(this, false);
 
-			Counter<ManaType> counter = new Counter<ManaType> { Data = ManaType.Values.ToDictionary((m) => m, (m) => new CounterData { Value = 0, Minimum = 0 }) };
+			counter = new Counter<ManaType> { Data = ManaType.Values.ToDictionary((m) => m, (m) => new CounterData { Value = 0, Minimum = 0 }) };
 
 			IDictionary<ManaType, ImageButton> buttons = ManaType.Values.ToDictionary(
 				(m) => m,
@@ -88,6 +90,16 @@ namespace TizenMtgCounter
 						}
 					}
 				};
+			}
+		}
+
+		public void Clear()
+		{
+			counter.Selected = null;
+			foreach (ManaType t in ManaType.Values)
+			{
+				counter[t] = 0;
+				counter.Labels[t].IsVisible = true;
 			}
 		}
 	}

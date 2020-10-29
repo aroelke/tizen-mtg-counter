@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
@@ -110,11 +111,7 @@ namespace TizenMtgCounter
 			set
 			{
 				if (SelectedValid())
-				{
-					data[selected].Value = value;
-					entry.Text = data[selected].Value.ToString();
-					entry.TextColor = TextColor;
-				}
+					this[selected] = value;
 			}
 		}
 
@@ -131,12 +128,15 @@ namespace TizenMtgCounter
 			get => Data[key].Value;
 			set
 			{
+				int old = Data[key].Value;
 				Data[key].Value = value;
 				if (EqualityComparer<K>.Default.Equals(key, selected))
 				{
 					entry.Text = Value.ToString();
 					entry.TextColor = TextColor;
 				}
+				if (Data[key].Value != old)
+					ValueChanged?.Invoke(this, new CounterChangedEventArgs<K> { Key = key, OldValue = old, NewValue = Data[key].Value });
 			}
 		}
 
@@ -173,5 +173,16 @@ namespace TizenMtgCounter
 				resetTicks.Start();
 			}
 		}
+
+		public event EventHandler ValueChanged;
+	}
+
+	public class CounterChangedEventArgs<K> : EventArgs
+	{
+		public CounterChangedEventArgs() : base() {}
+
+		public K Key { get; set; }
+		public int OldValue { get; set; }
+		public int NewValue { get; set; }
 	}
 }

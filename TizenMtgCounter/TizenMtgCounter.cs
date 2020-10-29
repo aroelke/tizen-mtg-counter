@@ -8,7 +8,8 @@ namespace TizenMtgCounter
 		{
 			base.OnCreate();
 			LoadApplication(new Application { MainPage = new NavigationPage(new MainPage(
-				new ManaPage()
+				new ManaPage(),
+				new HistoryPage { StartingLife = 20 }
 			)) });
 		}
 
