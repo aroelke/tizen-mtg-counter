@@ -11,17 +11,16 @@ namespace TizenMtgCounter
 		private const int LIFE = 1;
 		private const int POISON = 2;
 
-		public MainPage(ManaPage mana, HistoryPage history) : base()
+		private HistoryPage history;
+		private Counter<int> counter;
+
+		public MainPage(ManaPage mana, HistoryPage h) : base()
 		{
 			NavigationPage.SetHasNavigationBar(this, false);
 
-			Counter<int> counter = new Counter<int> {
-				Data = new Dictionary<int, CounterData>() {
-					[LIFE] = new CounterData { Value = history.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) }},
-					[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) }}
-				},
-				Selected = LIFE
-			};
+			history = h;
+			counter = new Counter<int>();
+			Clear();
 
 			bool maximized = false;
 
@@ -117,8 +116,7 @@ namespace TizenMtgCounter
 			};
 
 			history.Reset += (sender, e) => {
-				counter[LIFE] = history.StartingLife;
-				counter[POISON] = 0;
+				Clear();
 				mana.Clear();
 				history.Clear(); // Must come after resetting life counter so it doesn't record it
 			};
@@ -130,6 +128,15 @@ namespace TizenMtgCounter
 			historyPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(history, true);
 			historyPageButton.Pressed += (sender, e) => historyPageButton.Opacity = 1.0/3.0;
 			historyPageButton.Released += (sender, e) => historyPageButton.Opacity = 1;
+		}
+
+		public void Clear()
+		{
+			counter.Data = new Dictionary<int, CounterData>() {
+				[LIFE] = new CounterData { Value = history.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) } },
+				[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) } }
+			};
+			counter.Selected = LIFE;
 		}
 	}
 }

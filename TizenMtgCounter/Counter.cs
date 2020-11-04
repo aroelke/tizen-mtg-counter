@@ -86,14 +86,23 @@ namespace TizenMtgCounter
 			{
 				data = value;
 
-				Labels = value.ToDictionary((p) => p.Key, (p) => new Label { FontSize = 8 });
-				foreach (K key in data.Keys)
+				Labels = Labels.Where((e) => data.ContainsKey(e.Key)).ToDictionary((e) => e.Key, (e) => e.Value);
+				foreach (K key in value.Keys)
 				{
-					Labels[key].SetBinding(Label.TextProperty, "Value");
-					Labels[key].SetBinding(Label.TextColorProperty, "TextColor");
+					if (!Labels.ContainsKey(key))
+					{
+						Labels[key] = new Label { FontSize = 8 };
+						Labels[key].SetBinding(Label.TextProperty, "Value");
+						Labels[key].SetBinding(Label.TextColorProperty, "TextColor");
+					}
 					Labels[key].BindingContext = value[key];
 				}
 				entry.IsVisible = plusButton.IsVisible = minusButton.IsVisible = SelectedValid();
+				if (SelectedValid())
+				{
+					entry.Text = Value.ToString();
+					entry.TextColor = TextColor;
+				}
 
 				changeTimers = value.ToDictionary((p) => p.Key, (p) => new Timer {
 					Interval = changeInterval,
@@ -102,10 +111,12 @@ namespace TizenMtgCounter
 				});
 				oldValues = value.ToDictionary((p) => p.Key, (p) => p.Value.Value);
 				foreach (K key in changeTimers.Keys)
+				{
 					changeTimers[key].Elapsed += (sender, e) => {
 						if (oldValues[key] != Data[key].Value)
 							ValueChanged?.Invoke(this, new CounterChangedEventArgs<K> { Key = key, OldValue = oldValues[key], NewValue = Data[key].Value });
 					};
+				}
 			}
 		}
 

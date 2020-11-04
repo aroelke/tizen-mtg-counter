@@ -28,7 +28,7 @@ namespace TizenMtgCounter
 			historyLabels = new List<Label>();
 			historyList = new StackLayout { VerticalOptions = LayoutOptions.StartAndExpand };
 
-			startLabel = new Label();
+			startLabel = new Label { HorizontalTextAlignment = TextAlignment.Center };
 			startLabel.SetBinding(Label.TextProperty, "StartingLife");
 			startLabel.BindingContext = this;
 			Clear();
@@ -52,16 +52,7 @@ namespace TizenMtgCounter
 			changes.Clear();
 			historyLabels.Clear();
 			historyList.Children.Clear();
-
-			Grid startGrid = new Grid {
-				VerticalOptions = LayoutOptions.Center,
-				HorizontalOptions = LayoutOptions.CenterAndExpand,
-				RowDefinitions = { new RowDefinition() },
-				ColumnDefinitions = { new ColumnDefinition(), new ColumnDefinition() },
-				ColumnSpacing = LabelSpacing
-			};
-			startGrid.Children.Add(startLabel, 1, 0);
-			historyList.Children.Add(startGrid);
+			historyList.Children.Add(startLabel);
 		}
 
 		public int StartingLife
@@ -80,24 +71,25 @@ namespace TizenMtgCounter
 		{
 			changes.Add(n);
 
-			Grid changeGrid = new Grid {
-				VerticalOptions = LayoutOptions.Center,
-				HorizontalOptions = LayoutOptions.CenterAndExpand,
-				RowDefinitions = { new RowDefinition() },
-				ColumnDefinitions = { new ColumnDefinition(), new ColumnDefinition() },
-				ColumnSpacing = LabelSpacing
-			};
-			changeGrid.Children.Add(new Label {
-				Text = (n > 0 ? "+" : "") + n.ToString(),
-				TextColor = n < 0 ? Color.Red : Color.Default,
-				HorizontalTextAlignment = TextAlignment.End
-			}, 0, 0);
 			historyLabels.Add(new Label {
 				Text = (StartingLife + changes.Sum()).ToString(),
 				TextColor = n < 0 ? Color.Red : Color.Default
 			});
-			changeGrid.Children.Add(historyLabels.Last(), 1, 0);
-			historyList.Children.Add(changeGrid);
+			StackLayout row = new StackLayout {
+				VerticalOptions = LayoutOptions.Center,
+				HorizontalOptions = LayoutOptions.Center,
+				Orientation = StackOrientation.Horizontal,
+				Spacing = LabelSpacing,
+				Children = {
+					new Label {
+						Text = (n > 0 ? "+" : "") + n.ToString(),
+						TextColor = n < 0 ? Color.Red : Color.Default,
+						HorizontalTextAlignment = TextAlignment.End
+					},
+					historyLabels.Last()
+				}
+			};
+			historyList.Children.Add(row);
 		}
 
 		public event EventHandler Reset;
