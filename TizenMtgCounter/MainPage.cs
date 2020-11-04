@@ -41,7 +41,7 @@ namespace TizenMtgCounter
 			};
 
 			ImageButton historyPageButton = new ImageButton {
-				Source = "history.png", // Icon made by Freepik from www.flaticon.com
+				Source = "history.png", // Icon made by Google from www.flaticon.com
 				WidthRequest = 45,
 				HeightRequest = 45
 			};
@@ -71,7 +71,7 @@ namespace TizenMtgCounter
 			layout.Children.Add(
 				historyPageButton,
 				Constraint.RelativeToParent((p) => (p.Width - getSize(historyPageButton).Width)/2),
-				Constraint.Constant(7.5)
+				Constraint.Constant(0)
 			);
 			Content = layout;
 			RotaryFocusObject = counter;
