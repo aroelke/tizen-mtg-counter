@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
+using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
+using Label = Xamarin.Forms.Label;
+using NavigationPage = Xamarin.Forms.NavigationPage;
 
 namespace TizenMtgCounter
 {
@@ -30,8 +33,8 @@ namespace TizenMtgCounter
 			startLabel.BindingContext = this;
 			Clear();
 
-			Button reset = new Button { Text = "Reset", VerticalOptions = LayoutOptions.End };
-			Random r = new Random();
+			Button reset = new Button { Text = "New Game", VerticalOptions = LayoutOptions.End };
+			reset.On<Xamarin.Forms.PlatformConfiguration.Tizen>().SetStyle(ButtonStyle.Bottom);
 			reset.Clicked += (sender, e) => Reset?.Invoke(this, e);
 
 			CircleScrollView scroll = new CircleScrollView {
