@@ -205,7 +205,7 @@ namespace TizenMtgCounter
 			}
 		}
 
-		public event EventHandler ValueChanged;
+		public event EventHandler<CounterChangedEventArgs<K>> ValueChanged;
 	}
 
 	public class CounterChangedEventArgs<K> : EventArgs

@@ -77,8 +77,8 @@ namespace TizenMtgCounter
 			RotaryFocusObject = counter;
 
 			counter.ValueChanged += (sender, e) => {
-				if (e is CounterChangedEventArgs<int> args && args.Key == LIFE)
-					history.AddChange(args.NewValue - args.OldValue);
+				if (e.Key == LIFE)
+					history.AddChange(e.NewValue - e.OldValue);
 			};
 
 			bool maximize = false;
