@@ -18,12 +18,18 @@ namespace TizenMtgCounter
 		private readonly RepeatButton plusButton;
 		private readonly RepeatButton minusButton;
 		private readonly Timer resetTicks;
+		private int changeInterval;
+		private IDictionary<K, Timer> changeTimers;
+		private IDictionary<K, int> oldValues;
 
 		public Counter()
 		{
 			data = new Dictionary<K, CounterData>();
 			selected = default;
 			ticks = 0;
+			changeInterval = 600;
+			changeTimers = new Dictionary<K, Timer>();
+			oldValues = new Dictionary<K, int>();
 
 			entry = new CounterPopupEntry {
 				FontSize = 32,
@@ -80,7 +86,7 @@ namespace TizenMtgCounter
 			{
 				data = value;
 
-				Labels = value.Select((p) => new KeyValuePair<K, Label>(p.Key, new Label { FontSize = 8 })).ToDictionary((p) => p.Key, (p) => p.Value);
+				Labels = value.ToDictionary((p) => p.Key, (p) => new Label { FontSize = 8 });
 				foreach (K key in data.Keys)
 				{
 					Labels[key].SetBinding(Label.TextProperty, "Value");
@@ -88,6 +94,18 @@ namespace TizenMtgCounter
 					Labels[key].BindingContext = value[key];
 				}
 				entry.IsVisible = plusButton.IsVisible = minusButton.IsVisible = SelectedValid();
+
+				changeTimers = value.ToDictionary((p) => p.Key, (p) => new Timer {
+					Interval = changeInterval,
+					Enabled = false,
+					AutoReset = false
+				});
+				oldValues = value.ToDictionary((p) => p.Key, (p) => p.Value.Value);
+				foreach (K key in changeTimers.Keys)
+					changeTimers[key].Elapsed += (sender, e) => {
+						if (oldValues[key] != Data[key].Value)
+							ValueChanged?.Invoke(this, new CounterChangedEventArgs<K> { Key = key, OldValue = oldValues[key], NewValue = Data[key].Value });
+					};
 			}
 		}
 
@@ -123,20 +141,33 @@ namespace TizenMtgCounter
 
 		public int FastTickStep { get; set; } = 5;
 
+		public int ChangeInterval
+		{
+			get => changeInterval;
+			set
+			{
+				changeInterval = value;
+				foreach (Timer t in changeTimers.Values)
+					t.Interval = value;
+			}
+		}
+
 		public int this[K key]
 		{
 			get => Data[key].Value;
 			set
 			{
-				int old = Data[key].Value;
+				if (!changeTimers[key].Enabled)
+					oldValues[key] = Data[key].Value;
+				else
+					changeTimers[key].Stop();
 				Data[key].Value = value;
 				if (EqualityComparer<K>.Default.Equals(key, selected))
 				{
 					entry.Text = Value.ToString();
 					entry.TextColor = TextColor;
 				}
-				if (Data[key].Value != old)
-					ValueChanged?.Invoke(this, new CounterChangedEventArgs<K> { Key = key, OldValue = old, NewValue = Data[key].Value });
+				changeTimers[key].Start();
 			}
 		}
 
