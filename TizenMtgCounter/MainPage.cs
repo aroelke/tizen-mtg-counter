@@ -11,8 +11,8 @@ namespace TizenMtgCounter
 		private const int LIFE = 1;
 		private const int POISON = 2;
 
-		private HistoryPage history;
-		private Counter<int> counter;
+		private readonly HistoryPage history;
+		private readonly Counter<int> counter;
 
 		public MainPage(ManaPage mana, HistoryPage h) : base()
 		{
@@ -21,8 +21,6 @@ namespace TizenMtgCounter
 			history = h;
 			counter = new Counter<int>();
 			Clear();
-
-			bool maximized = false;
 
 			ImageButton poisonButton = new ImageButton
 			{
@@ -87,7 +85,7 @@ namespace TizenMtgCounter
 				AutoReset = false
 			};
 			maximizeTimer.Elapsed += (sender, e) => {
-				maximize = maximized = true;
+				maximize = true;
 				Device.BeginInvokeOnMainThread(() => {
 					counter.Selected = POISON;
 					counter.Labels[POISON].IsVisible = false;
@@ -95,7 +93,7 @@ namespace TizenMtgCounter
 			};
 			poisonButton.Pressed += (sender, e) => {
 				poisonButton.Opacity = 1.0/3.0;
-				if (!maximized)
+				if (counter.Selected == LIFE)
 					maximizeTimer.Start();
 			};
 			poisonButton.Released += (sender, e) => {
@@ -103,9 +101,8 @@ namespace TizenMtgCounter
 				maximizeTimer.Stop();
 				if (!maximize)
 				{
-					if (maximized)
+					if (counter.Selected == POISON)
 					{
-						maximized = false;
 						counter.Selected = LIFE;
 						counter.Labels[POISON].IsVisible = true;
 					}
