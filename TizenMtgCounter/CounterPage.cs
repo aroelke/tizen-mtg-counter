@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Immutable;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
@@ -9,13 +9,13 @@ namespace TizenMtgCounter
 	public class CounterPage<K> : BezelInteractionPage
 	{
 		protected readonly Counter<K> counter;
-		private readonly Dictionary<K, CounterData> initialValues;
+		private readonly IImmutableDictionary<K, CounterData> initialValues;
 		private readonly K initialFocus;
 		private readonly RelativeLayout layout;
 
-		public CounterPage() : this(new Dictionary<K, CounterData>()) {}
+		public CounterPage() : this(ImmutableDictionary<K, CounterData>.Empty) {}
 
-		public CounterPage(Dictionary<K, CounterData> initial, K focus = default) : base()
+		public CounterPage(IImmutableDictionary<K, CounterData> initial, K focus = default) : base()
 		{
 			NavigationPage.SetHasNavigationBar(this, false);
 
@@ -76,7 +76,7 @@ namespace TizenMtgCounter
 
 		public virtual void Clear()
 		{
-			counter.Data = initialValues.ToDictionary((e) => e.Key, (e) => new CounterData(e.Value));
+			counter.Data = initialValues.ToImmutableDictionary((e) => e.Key, (e) => new CounterData(e.Value));
 			counter.Selected = initialFocus;
 			foreach (Label l in counter.Labels.Values)
 				l.IsVisible = true;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
@@ -12,6 +13,7 @@ namespace TizenMtgCounter
 	public class Counter<K> : IRotaryEventReceiver
 	{
 		private IDictionary<K, CounterData> data;
+		private IDictionary<K, Label> labels;
 		private K selected;
 		private int ticks;
 		private readonly CounterPopupEntry entry;
@@ -25,6 +27,7 @@ namespace TizenMtgCounter
 		public Counter()
 		{
 			data = new Dictionary<K, CounterData>();
+			labels = new Dictionary<K, Label>();
 			selected = default;
 			ticks = 0;
 			changeInterval = 600;
@@ -79,21 +82,21 @@ namespace TizenMtgCounter
 			};
 		}
 
-		public IDictionary<K, CounterData> Data
+		public IImmutableDictionary<K, CounterData> Data
 		{
-			get => data;
+			get => data.ToImmutableDictionary();
 			set
 			{
-				data = value;
+				data = value.ToDictionary((e) => e.Key, (e) => e.Value);
 
-				Labels = Labels.Where((e) => data.ContainsKey(e.Key)).ToDictionary((e) => e.Key, (e) => e.Value);
+				labels = Labels.Where((e) => data.ContainsKey(e.Key)).ToDictionary((e) => e.Key, (e) => e.Value);
 				foreach (K key in value.Keys)
 				{
 					if (!Labels.ContainsKey(key))
 					{
-						Labels[key] = new Label { FontSize = 8 };
-						Labels[key].SetBinding(Label.TextProperty, "Value");
-						Labels[key].SetBinding(Label.TextColorProperty, "TextColor");
+						labels[key] = new Label { FontSize = 8 };
+						labels[key].SetBinding(Label.TextProperty, "Value");
+						labels[key].SetBinding(Label.TextColorProperty, "TextColor");
 					}
 					Labels[key].BindingContext = value[key];
 				}
@@ -120,7 +123,7 @@ namespace TizenMtgCounter
 			}
 		}
 
-		public IDictionary<K, Label> Labels { get; private set; } = new Dictionary<K, Label>();
+		public IImmutableDictionary<K, Label> Labels { get => labels.ToImmutableDictionary(); }
 
 		public K Selected
 		{

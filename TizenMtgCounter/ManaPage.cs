@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Immutable;
 using Xamarin.Forms;
 
 namespace TizenMtgCounter
@@ -8,7 +8,7 @@ namespace TizenMtgCounter
 	{
 		private const int ButtonSize = 60;
 
-		public ManaPage() : base(ManaType.Values.ToDictionary((m) => m, (m) => new CounterData { Value = 0, Minimum = 0 }))
+		public ManaPage() : base(ManaType.Values.ToImmutableDictionary((m) => m, (m) => new CounterData { Value = 0, Minimum = 0 }))
 		{
 			for (int i = 0; i < ManaType.Values.Count; i++)
 			{

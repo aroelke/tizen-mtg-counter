@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Timers;
-using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
 
 namespace TizenMtgCounter
@@ -127,7 +127,7 @@ namespace TizenMtgCounter
 				counter.Data = new Dictionary<int, CounterData>() {
 					[LIFE] = new CounterData { Value = history.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) } },
 					[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) } }
-				};
+				}.ToImmutableDictionary();
 				counter.Selected = LIFE;
 			}
 		}
