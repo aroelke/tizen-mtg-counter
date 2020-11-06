@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace TizenMtgCounter
 {
@@ -11,7 +12,7 @@ namespace TizenMtgCounter
 		public static readonly ManaType Red = new ManaType { Name = "red" };
 		public static readonly ManaType Green = new ManaType { Name = "green" };
 
-		public static IList<ManaType> Values => new List<ManaType> { Colorless, White, Blue, Black, Red, Green };
+		public static IImmutableList<ManaType> Values => new List<ManaType> { Colorless, White, Blue, Black, Red, Green }.ToImmutableList();
 
 		private ManaType() {}
 
