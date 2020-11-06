@@ -74,7 +74,7 @@ namespace TizenMtgCounter
 
 		public RelativeLayout.IRelativeList<View> Children { get => layout.Children; }
 
-		public void Clear()
+		public virtual void Clear()
 		{
 			counter.Data = initialValues.ToDictionary((e) => e.Key, (e) => new CounterData(e.Value));
 			counter.Selected = initialFocus;

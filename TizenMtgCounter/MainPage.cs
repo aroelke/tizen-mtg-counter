@@ -6,20 +6,16 @@ using Xamarin.Forms;
 
 namespace TizenMtgCounter
 {
-	public class MainPage : BezelInteractionPage
+	public class MainPage : CounterPage<int>
 	{
 		private const int LIFE = 1;
 		private const int POISON = 2;
 
 		private readonly HistoryPage history;
-		private readonly Counter<int> counter;
 
 		public MainPage(ManaPage mana, HistoryPage h) : base()
 		{
-			NavigationPage.SetHasNavigationBar(this, false);
-
 			history = h;
-			counter = new Counter<int>();
 			Clear();
 
 			ImageButton poisonButton = new ImageButton
@@ -43,35 +39,31 @@ namespace TizenMtgCounter
 				HeightRequest = 45
 			};
 
-			Size getSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
-			RelativeLayout layout = new RelativeLayout();
-			layout.Children.Add(
+			Children.Add(
 				counter.Content,
-				Constraint.RelativeToParent((p) => (p.Width - getSize(counter.Content).Width)/2),
-				Constraint.RelativeToParent((p) => (p.Height - getSize(counter.Content).Height)/2)
+				Constraint.RelativeToParent((p) => (p.Width - GetSize(counter.Content).Width)/2),
+				Constraint.RelativeToParent((p) => (p.Height - GetSize(counter.Content).Height)/2)
 			);
-			layout.Children.Add(
+			Children.Add(
 				counter.Labels[POISON],
-				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 3)/2 - getSize(counter.Labels[POISON]).Width/2),
-				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 3)/2 - getSize(counter.Labels[POISON]).Height/2)
+				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - GetSize(poisonButton).Width*(Math.Sqrt(2) - 3)/2 - GetSize(counter.Labels[POISON]).Width/2),
+				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - GetSize(poisonButton).Height*(Math.Sqrt(2) - 3)/2 - GetSize(counter.Labels[POISON]).Height/2)
 			);
-			layout.Children.Add(
+			Children.Add(
 				poisonButton,
-				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Width*(Math.Sqrt(2) - 1)/2),
-				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - getSize(poisonButton).Height*(Math.Sqrt(2) - 1)/2)
+				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - GetSize(poisonButton).Width*(Math.Sqrt(2) - 1)/2),
+				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - GetSize(poisonButton).Height*(Math.Sqrt(2) - 1)/2)
 			);
-			layout.Children.Add(
+			Children.Add(
 				manaPageButton,
-				Constraint.RelativeToParent((p) => p.Width - getSize(manaPageButton).Width),
-				Constraint.RelativeToParent((p) => (p.Height - getSize(manaPageButton).Height)/2)
+				Constraint.RelativeToParent((p) => p.Width - GetSize(manaPageButton).Width),
+				Constraint.RelativeToParent((p) => (p.Height - GetSize(manaPageButton).Height)/2)
 			);
-			layout.Children.Add(
+			Children.Add(
 				historyPageButton,
-				Constraint.RelativeToParent((p) => (p.Width - getSize(historyPageButton).Width)/2),
+				Constraint.RelativeToParent((p) => (p.Width - GetSize(historyPageButton).Width)/2),
 				Constraint.Constant(0)
 			);
-			Content = layout;
-			RotaryFocusObject = counter;
 
 			counter.ValueChanged += (sender, e) => {
 				if (e.Key == LIFE)
@@ -127,13 +119,17 @@ namespace TizenMtgCounter
 			historyPageButton.Released += (sender, e) => historyPageButton.Opacity = 1;
 		}
 
-		public void Clear()
+		public override void Clear()
 		{
-			counter.Data = new Dictionary<int, CounterData>() {
-				[LIFE] = new CounterData { Value = history.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) } },
-				[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) } }
-			};
-			counter.Selected = LIFE;
+			// Make sure super constructor doesn't run this code before history is assigned
+			if (history != null)
+			{
+				counter.Data = new Dictionary<int, CounterData>() {
+					[LIFE] = new CounterData { Value = history.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) } },
+					[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) } }
+				};
+				counter.Selected = LIFE;
+			}
 		}
 	}
 }
