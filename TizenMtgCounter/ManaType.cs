@@ -2,7 +2,7 @@
 
 namespace TizenMtgCounter
 {
-	class ManaType
+	public class ManaType
 	{
 		public static readonly ManaType Colorless = new ManaType { Name = "colorless" };
 		public static readonly ManaType White = new ManaType { Name = "white" };

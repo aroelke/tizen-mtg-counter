@@ -10,6 +10,16 @@ namespace TizenMtgCounter
 	{
 		private int val = 0;
 
+		public CounterData() {}
+
+		public CounterData(CounterData original)
+		{
+			val = original.val;
+			Minimum = original.Minimum;
+			Maximum = original.Maximum;
+			Thresholds = original.Thresholds;
+		}
+
 		public int Value {
 			get => val;
 			set
