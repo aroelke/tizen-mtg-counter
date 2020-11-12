@@ -39,31 +39,14 @@ namespace TizenMtgCounter
 				HeightRequest = 45
 			};
 
-			Children.Add(
-				counter.Content,
-				Constraint.RelativeToParent((p) => (p.Width - GetSize(counter.Content).Width)/2),
-				Constraint.RelativeToParent((p) => (p.Height - GetSize(counter.Content).Height)/2)
-			);
+			Children.Add(poisonButton, (p) => (p.Width - p.GetSize(poisonButton).Width)/2 + 5, 5*Math.PI/4);
 			Children.Add(
 				counter.Labels[POISON],
-				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - GetSize(poisonButton).Width*(Math.Sqrt(2) - 3)/2 - GetSize(counter.Labels[POISON]).Width/2),
-				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - GetSize(poisonButton).Height*(Math.Sqrt(2) - 3)/2 - GetSize(counter.Labels[POISON]).Height/2)
+				(p) => (p.Width - Math.Max(p.GetSize(counter.Labels[POISON]).Width, p.GetSize(counter.Labels[POISON]).Height))/2 - 55,
+				5*Math.PI/4
 			);
-			Children.Add(
-				poisonButton,
-				Constraint.RelativeToParent((p) => p.Width/2*(1 - 1/Math.Sqrt(2)) - GetSize(poisonButton).Width*(Math.Sqrt(2) - 1)/2),
-				Constraint.RelativeToParent((p) => p.Height/2*(1 - 1/Math.Sqrt(2)) - GetSize(poisonButton).Height*(Math.Sqrt(2) - 1)/2)
-			);
-			Children.Add(
-				manaPageButton,
-				Constraint.RelativeToParent((p) => p.Width - GetSize(manaPageButton).Width),
-				Constraint.RelativeToParent((p) => (p.Height - GetSize(manaPageButton).Height)/2)
-			);
-			Children.Add(
-				historyPageButton,
-				Constraint.RelativeToParent((p) => (p.Width - GetSize(historyPageButton).Width)/2),
-				Constraint.Constant(0)
-			);
+			Children.Add(manaPageButton, (p) => (p.Width - 60)/2, 0);
+			Children.Add(historyPageButton, (p) => (p.Width - 45)/2, 3*Math.PI/2);
 
 			counter.ValueChanged += (sender, e) => {
 				if (e.Key == LIFE)

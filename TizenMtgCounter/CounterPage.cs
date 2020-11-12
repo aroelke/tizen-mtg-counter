@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
@@ -32,7 +33,7 @@ namespace TizenMtgCounter
 			);
 		}
 
-		public Size GetSize(View view) => new Size(view.Measure(Width, Height).Request.Width, view.Measure(Width, Height).Request.Height);
+		public Size GetSize(View view) => Content.GetSize(view);
 
 		public void AddButton(K key, ImageButton button, Constraint x = null, Constraint y = null, Constraint w = null, Constraint h = null)
 		{
@@ -72,7 +73,13 @@ namespace TizenMtgCounter
 			layout.Children.Add(button, x, y, w, h);
 		}
 
-		public RelativeLayout.IRelativeList<View> Children { get => layout.Children; }
+		public void AddButton(K key, ImageButton button, double theta = 0) => AddButton(
+			key, button,
+			Constraint.RelativeToParent((p) => (p.Width - GetSize(button).Width)/2*(1 + Math.Cos(theta))),
+			Constraint.RelativeToParent((p) => (p.Height - GetSize(button).Height)/2*(1 + Math.Sin(theta)))
+		);
+
+		public RelativeLayout.IRelativeList<View> Children => layout.Children;
 
 		public virtual void Clear()
 		{
@@ -80,6 +87,29 @@ namespace TizenMtgCounter
 			counter.Selected = initialFocus;
 			foreach (Label l in counter.Labels.Values)
 				l.IsVisible = true;
+		}
+	}
+
+	public static class CounterPageLayoutExtensions
+	{
+		public static Size GetSize(this View v, View view) => new Size(view.Measure(v.Width, v.Height).Request.Width, view.Measure(v.Width, v.Height).Request.Height);
+
+		public static void Add(this RelativeLayout.IRelativeList<View> children, View view, double r, double theta, Constraint w = null, Constraint h = null)
+		{
+			children.Add(view,
+				Constraint.RelativeToParent((p) => (p.Width - p.GetSize(view).Width)/2 + r*Math.Cos(theta)),
+				Constraint.RelativeToParent((p) => (p.Height - p.GetSize(view).Height)/2 + r*Math.Sin(theta)),
+				w, h
+			);
+		}
+
+		public static void Add(this RelativeLayout.IRelativeList<View> children, View view, Func<RelativeLayout, double> r, double theta, Constraint w = null, Constraint h = null)
+		{
+			children.Add(view,
+				Constraint.RelativeToParent((p) => (p.Width - p.GetSize(view).Width)/2 + r(p)*Math.Cos(theta)),
+				Constraint.RelativeToParent((p) => (p.Height - p.GetSize(view).Height)/2 + r(p)*Math.Sin(theta)),
+				w, h
+			);
 		}
 	}
 }
