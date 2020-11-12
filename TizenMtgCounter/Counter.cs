@@ -13,7 +13,6 @@ namespace TizenMtgCounter
 	public class Counter<K> : IRotaryEventReceiver
 	{
 		private IDictionary<K, CounterData> data;
-		private IDictionary<K, Label> labels;
 		private K selected;
 		private int ticks;
 		private readonly CounterPopupEntry entry;
@@ -27,7 +26,6 @@ namespace TizenMtgCounter
 		public Counter()
 		{
 			data = new Dictionary<K, CounterData>();
-			labels = new Dictionary<K, Label>();
 			selected = default;
 			ticks = 0;
 			changeInterval = 600;
@@ -89,17 +87,6 @@ namespace TizenMtgCounter
 			{
 				data = value.ToDictionary((e) => e.Key, (e) => e.Value);
 
-				labels = Labels.Where((e) => data.ContainsKey(e.Key)).ToDictionary((e) => e.Key, (e) => e.Value);
-				foreach (K key in value.Keys)
-				{
-					if (!Labels.ContainsKey(key))
-					{
-						labels[key] = new Label { FontSize = 8 };
-						labels[key].SetBinding(Label.TextProperty, "Value");
-						labels[key].SetBinding(Label.TextColorProperty, "TextColor");
-					}
-					Labels[key].BindingContext = value[key];
-				}
 				entry.IsVisible = plusButton.IsVisible = minusButton.IsVisible = SelectedValid();
 				if (SelectedValid())
 				{
@@ -122,8 +109,6 @@ namespace TizenMtgCounter
 				}
 			}
 		}
-
-		public IImmutableDictionary<K, Label> Labels { get => labels.ToImmutableDictionary(); }
 
 		public K Selected
 		{

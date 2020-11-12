@@ -8,7 +8,7 @@ namespace TizenMtgCounter
 	{
 		private const int ButtonSize = 60;
 
-		public ManaPage() : base(ManaType.Values.ToImmutableDictionary((m) => m, (m) => new CounterData { Value = 0, Minimum = 0 }))
+		public ManaPage() : base(() => ManaType.Values.ToImmutableDictionary((m) => m, (m) => new CounterData { Value = 0, Minimum = 0 }))
 		{
 			for (int i = 0; i < ManaType.Values.Count; i++)
 			{
@@ -21,8 +21,8 @@ namespace TizenMtgCounter
 				};
 				AddButton(ManaType.Values[i], button, (i - 2)*Math.PI/3);
 				Children.Add(
-					counter.Labels[t],
-					(p) => (p.Width - Math.Max(p.GetSize(counter.Labels[t]).Width, p.GetSize(counter.Labels[t]).Height))/2 - ButtonSize,
+					Labels[t],
+					(p) => (p.Width - Math.Max(p.GetSize(Labels[t]).Width, p.GetSize(Labels[t]).Height))/2 - ButtonSize,
 					(i - 2)*Math.PI/3
 				);
 			}

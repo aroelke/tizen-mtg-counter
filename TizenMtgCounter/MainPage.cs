@@ -13,10 +13,12 @@ namespace TizenMtgCounter
 
 		private readonly HistoryPage history;
 
-		public MainPage(ManaPage mana, HistoryPage h) : base()
+		public MainPage(ManaPage mana, HistoryPage h) : base(() => new Dictionary<int, CounterData>() {
+			[LIFE] = new CounterData { Value = h.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) } },
+			[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) } }
+		}.ToImmutableDictionary(), LIFE)
 		{
 			history = h;
-			Clear();
 
 			ImageButton poisonButton = new ImageButton
 			{
@@ -25,14 +27,12 @@ namespace TizenMtgCounter
 				HeightRequest = 70,
 				CornerRadius = 35
 			};
-
 			ImageButton manaPageButton = new ImageButton {
 				Source = "mana.png",
 				WidthRequest = 60,
 				HeightRequest = 60,
 				CornerRadius = 30
 			};
-
 			ImageButton historyPageButton = new ImageButton {
 				Source = "history.png", // Icon made by Google from www.flaticon.com
 				WidthRequest = 45,
@@ -41,8 +41,8 @@ namespace TizenMtgCounter
 
 			Children.Add(poisonButton, (p) => (p.Width - p.GetSize(poisonButton).Width)/2 + 5, 5*Math.PI/4);
 			Children.Add(
-				counter.Labels[POISON],
-				(p) => (p.Width - Math.Max(p.GetSize(counter.Labels[POISON]).Width, p.GetSize(counter.Labels[POISON]).Height))/2 - 55,
+				Labels[POISON],
+				(p) => (p.Width - Math.Max(p.GetSize(Labels[POISON]).Width, p.GetSize(Labels[POISON]).Height))/2 - 55,
 				5*Math.PI/4
 			);
 			Children.Add(manaPageButton, (p) => (p.Width - 60)/2, 0);
@@ -63,7 +63,7 @@ namespace TizenMtgCounter
 				maximize = true;
 				Device.BeginInvokeOnMainThread(() => {
 					counter.Selected = POISON;
-					counter.Labels[POISON].IsVisible = false;
+					Labels[POISON].IsVisible = false;
 				});
 			};
 			poisonButton.Pressed += (sender, e) => {
@@ -79,7 +79,7 @@ namespace TizenMtgCounter
 					if (counter.Selected == POISON)
 					{
 						counter.Selected = LIFE;
-						counter.Labels[POISON].IsVisible = true;
+						Labels[POISON].IsVisible = true;
 					}
 					else
 						counter[POISON]++;
@@ -100,19 +100,6 @@ namespace TizenMtgCounter
 			historyPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(history, true);
 			historyPageButton.Pressed += (sender, e) => historyPageButton.Opacity = 1.0/3.0;
 			historyPageButton.Released += (sender, e) => historyPageButton.Opacity = 1;
-		}
-
-		public override void Clear()
-		{
-			// Make sure super constructor doesn't run this code before history is assigned
-			if (history != null)
-			{
-				counter.Data = new Dictionary<int, CounterData>() {
-					[LIFE] = new CounterData { Value = history.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) } },
-					[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) } }
-				}.ToImmutableDictionary();
-				counter.Selected = LIFE;
-			}
 		}
 	}
 }

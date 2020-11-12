@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
@@ -10,30 +11,34 @@ namespace TizenMtgCounter
 	public class CounterPage<K> : BezelInteractionPage
 	{
 		protected readonly Counter<K> counter;
-		private readonly IImmutableDictionary<K, CounterData> initialValues;
+		private readonly Func<IImmutableDictionary<K, CounterData>> initialValues;
 		private readonly K initialFocus;
 		private readonly RelativeLayout layout;
+		private IDictionary<K, Label> labels;
 
-		public CounterPage() : this(ImmutableDictionary<K, CounterData>.Empty) {}
+		public CounterPage() : this(() => ImmutableDictionary<K, CounterData>.Empty) {}
 
-		public CounterPage(IImmutableDictionary<K, CounterData> initial, K focus = default) : base()
+		public CounterPage(Func<IImmutableDictionary<K, CounterData>> initial, K focus = default) : base()
 		{
 			NavigationPage.SetHasNavigationBar(this, false);
 
 			RotaryFocusObject = counter = new Counter<K>();
 			initialValues = initial;
 			initialFocus = focus;
+			labels = new Dictionary<K, Label>();
 			Clear();
 
 			Content = layout = new RelativeLayout();
 			layout.Children.Add(
 				counter.Content,
-				Constraint.RelativeToParent((p) => (p.Width - GetSize(counter.Content).Width)/2),
-				Constraint.RelativeToParent((p) => (p.Height - GetSize(counter.Content).Height)/2)
+				Constraint.RelativeToParent((p) => (p.Width - p.GetSize(counter.Content).Width)/2),
+				Constraint.RelativeToParent((p) => (p.Height - p.GetSize(counter.Content).Height)/2)
 			);
 		}
 
-		public Size GetSize(View view) => Content.GetSize(view);
+		public RelativeLayout.IRelativeList<View> Children => layout.Children;
+
+		public IImmutableDictionary<K, Label> Labels => labels.ToImmutableDictionary();
 
 		public void AddButton(K key, ImageButton button, Constraint x = null, Constraint y = null, Constraint w = null, Constraint h = null)
 		{
@@ -58,14 +63,14 @@ namespace TizenMtgCounter
 					if (EqualityComparer<K>.Default.Equals(counter.Selected, key))
 					{
 						counter.Selected = default;
-						counter.Labels[key].IsVisible = true;
+						labels[key].IsVisible = true;
 					}
 					else
 					{
 						if (counter.SelectedValid())
-							counter.Labels[counter.Selected].IsVisible = true;
+							labels[counter.Selected].IsVisible = true;
 						counter.Selected = key;
-						counter.Labels[key].IsVisible = false;
+						labels[key].IsVisible = false;
 					}
 				}
 			};
@@ -75,18 +80,27 @@ namespace TizenMtgCounter
 
 		public void AddButton(K key, ImageButton button, double theta = 0) => AddButton(
 			key, button,
-			Constraint.RelativeToParent((p) => (p.Width - GetSize(button).Width)/2*(1 + Math.Cos(theta))),
-			Constraint.RelativeToParent((p) => (p.Height - GetSize(button).Height)/2*(1 + Math.Sin(theta)))
+			Constraint.RelativeToParent((p) => (p.Width - p.GetSize(button).Width)/2*(1 + Math.Cos(theta))),
+			Constraint.RelativeToParent((p) => (p.Height - p.GetSize(button).Height)/2*(1 + Math.Sin(theta)))
 		);
-
-		public RelativeLayout.IRelativeList<View> Children => layout.Children;
 
 		public virtual void Clear()
 		{
-			counter.Data = initialValues.ToImmutableDictionary((e) => e.Key, (e) => new CounterData(e.Value));
+			var initial = initialValues();
+			counter.Data = initial;
+			labels = labels.Where((e) => initial.ContainsKey(e.Key)).ToDictionary((e) => e.Key, (e) => e.Value);
+			foreach (K key in initial.Keys)
+			{
+				if (!labels.ContainsKey(key))
+				{
+					labels[key] = new Label { FontSize = 8 };
+					labels[key].SetBinding(Label.TextProperty, "Value");
+					labels[key].SetBinding(Label.TextColorProperty, "TextColor");
+				}
+				labels[key].BindingContext = initial[key];
+				labels[key].IsVisible = true;
+			}
 			counter.Selected = initialFocus;
-			foreach (Label l in counter.Labels.Values)
-				l.IsVisible = true;
 		}
 	}
 
