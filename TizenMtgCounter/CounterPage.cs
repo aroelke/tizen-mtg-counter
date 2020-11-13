@@ -15,6 +15,7 @@ namespace TizenMtgCounter
 		private readonly K initialFocus;
 		private readonly RelativeLayout layout;
 		private IDictionary<K, Label> labels;
+		private readonly CounterPopupEntry entry;
 
 		public CounterPage() : this(() => ImmutableDictionary<K, CounterData>.Empty) {}
 
@@ -27,12 +28,39 @@ namespace TizenMtgCounter
 			initialFocus = focus;
 			labels = new Dictionary<K, Label>();
 			Clear();
+			entry = new CounterPopupEntry {
+				Text = counter.Value.ToString(),
+				FontSize = 32,
+				Keyboard = Keyboard.Numeric,
+				BackgroundColor = Color.Transparent,
+				HorizontalTextAlignment = TextAlignment.Center,
+				IsVisible = counter.SelectedValid()
+			};
+			entry.Completed += (sender, e) => {
+				if (int.TryParse(entry.Text, out int result))
+					counter.Value = result;
+			};
+
+			counter.PropertyChanged += (sender, e) => {
+				switch (e.PropertyName)
+				{
+				case "Value":
+					entry.Text = counter.Value.ToString();
+					break;
+				case "TextColor":
+					entry.TextColor = counter.TextColor;
+					break;
+				case "SelectedValid":
+					entry.IsVisible = counter.SelectedValid();
+					break;
+				}
+			};
 
 			Content = layout = new RelativeLayout();
 			layout.Children.Add(
-				counter.Content,
-				Constraint.RelativeToParent((p) => (p.Width - p.GetSize(counter.Content).Width)/2),
-				Constraint.RelativeToParent((p) => (p.Height - p.GetSize(counter.Content).Height)/2)
+				entry,
+				Constraint.RelativeToParent((p) => (p.Width - p.GetSize(entry).Width)/2),
+				Constraint.RelativeToParent((p) => (p.Height - p.GetSize(entry).Height)/2)
 			);
 		}
 
@@ -64,6 +92,7 @@ namespace TizenMtgCounter
 					{
 						counter.Selected = default;
 						labels[key].IsVisible = true;
+						entry.IsVisible = false;
 					}
 					else
 					{
@@ -71,6 +100,7 @@ namespace TizenMtgCounter
 							labels[counter.Selected].IsVisible = true;
 						counter.Selected = key;
 						labels[key].IsVisible = false;
+						entry.IsVisible = true;
 					}
 				}
 			};

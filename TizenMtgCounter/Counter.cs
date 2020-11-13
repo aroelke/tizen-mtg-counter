@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
@@ -10,12 +12,11 @@ using Label = Xamarin.Forms.Label;
 
 namespace TizenMtgCounter
 {
-	public class Counter<K> : IRotaryEventReceiver
+	public class Counter<K> : IRotaryEventReceiver, INotifyPropertyChanged
 	{
 		private IDictionary<K, CounterData> data;
 		private K selected;
 		private int ticks;
-		private readonly CounterPopupEntry entry;
 		private readonly RepeatButton plusButton;
 		private readonly RepeatButton minusButton;
 		private readonly Timer resetTicks;
@@ -32,12 +33,6 @@ namespace TizenMtgCounter
 			changeTimers = new Dictionary<K, Timer>();
 			oldValues = new Dictionary<K, int>();
 
-			entry = new CounterPopupEntry {
-				FontSize = 32,
-				Keyboard = Keyboard.Numeric,
-				BackgroundColor = Color.Transparent,
-				HorizontalTextAlignment = TextAlignment.Center
-			};
 			plusButton = new RepeatButton {
 				Text = "+",
 				Delay = 500,
@@ -62,22 +57,10 @@ namespace TizenMtgCounter
 			};
 			resetTicks.Elapsed += (sender, e) => ticks = 0;
 
-			entry.Completed += (sender, e) => {
-				if (int.TryParse(entry.Text, out int result))
-					Value = result;
-			};
-
 			plusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Value++);
 			plusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Value++);
 			minusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Value--);
 			minusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Value--);
-
-			Content = new StackLayout {
-				HorizontalOptions = LayoutOptions.Center,
-				VerticalOptions = LayoutOptions.Center,
-				Spacing = -24,
-				Children = { plusButton, entry, minusButton }
-			};
 		}
 
 		public IImmutableDictionary<K, CounterData> Data
@@ -87,12 +70,7 @@ namespace TizenMtgCounter
 			{
 				data = value.ToDictionary((e) => e.Key, (e) => e.Value);
 
-				entry.IsVisible = plusButton.IsVisible = minusButton.IsVisible = SelectedValid();
-				if (SelectedValid())
-				{
-					entry.Text = Value.ToString();
-					entry.TextColor = TextColor;
-				}
+				plusButton.IsVisible = minusButton.IsVisible = SelectedValid();
 
 				changeTimers = value.ToDictionary((p) => p.Key, (p) => new Timer {
 					Interval = changeInterval,
@@ -107,6 +85,12 @@ namespace TizenMtgCounter
 							ValueChanged?.Invoke(this, new CounterChangedEventArgs<K> { Key = key, OldValue = oldValues[key], NewValue = Data[key].Value });
 					};
 				}
+
+				if (SelectedValid())
+				{
+					OnPropertyChanged("Value");
+					OnPropertyChanged("TextColor");
+				}
 			}
 		}
 
@@ -115,10 +99,14 @@ namespace TizenMtgCounter
 			get => selected;
 			set
 			{
-				selected = value;
-				entry.IsVisible = plusButton.IsVisible = minusButton.IsVisible = !EqualityComparer<K>.Default.Equals(value, default);
-				entry.Text = Value.ToString();
-				entry.TextColor = TextColor;
+				if (!EqualityComparer<K>.Default.Equals(selected, value))
+				{
+					selected = value;
+					plusButton.IsVisible = minusButton.IsVisible = !EqualityComparer<K>.Default.Equals(value, default);
+					OnPropertyChanged("Value");
+					OnPropertyChanged("TextColor");
+					OnPropertyChanged("SelectedValid");
+				}
 			}
 		}
 
@@ -156,17 +144,20 @@ namespace TizenMtgCounter
 			get => Data[key].Value;
 			set
 			{
-				if (!changeTimers[key].Enabled)
-					oldValues[key] = Data[key].Value;
-				else
-					changeTimers[key].Stop();
-				Data[key].Value = value;
-				if (EqualityComparer<K>.Default.Equals(key, selected))
+				if (Data[key].Value != value)
 				{
-					entry.Text = Value.ToString();
-					entry.TextColor = TextColor;
+					if (!changeTimers[key].Enabled)
+						oldValues[key] = Data[key].Value;
+					else
+						changeTimers[key].Stop();
+					Data[key].Value = value;
+					if (EqualityComparer<K>.Default.Equals(key, selected))
+					{
+						OnPropertyChanged("Value");
+						OnPropertyChanged("TextColor");
+					}
+					changeTimers[key].Start();
 				}
-				changeTimers[key].Start();
 			}
 		}
 
@@ -203,6 +194,13 @@ namespace TizenMtgCounter
 				resetTicks.Start();
 			}
 		}
+
+		private void OnPropertyChanged([CallerMemberName] string name = null)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		public event EventHandler<CounterChangedEventArgs<K>> ValueChanged;
 	}
