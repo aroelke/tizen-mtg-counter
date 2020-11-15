@@ -17,8 +17,6 @@ namespace TizenMtgCounter
 		private IDictionary<K, CounterData> data;
 		private K selected;
 		private int ticks;
-		private readonly RepeatButton plusButton;
-		private readonly RepeatButton minusButton;
 		private readonly Timer resetTicks;
 		private int changeInterval;
 		private IDictionary<K, Timer> changeTimers;
@@ -33,34 +31,12 @@ namespace TizenMtgCounter
 			changeTimers = new Dictionary<K, Timer>();
 			oldValues = new Dictionary<K, int>();
 
-			plusButton = new RepeatButton {
-				Text = "+",
-				Delay = 500,
-				Interval = 100,
-				HorizontalOptions = LayoutOptions.Center,
-				WidthRequest = 60
-			};
-			plusButton.On<Xamarin.Forms.PlatformConfiguration.Tizen>().SetStyle(ButtonStyle.Text);
-			minusButton = new RepeatButton {
-				Text = "\u2212",
-				Delay = 500,
-				Interval = 100,
-				HorizontalOptions = LayoutOptions.Center,
-				WidthRequest = 60
-			};
-			minusButton.On<Xamarin.Forms.PlatformConfiguration.Tizen>().SetStyle(ButtonStyle.Text);
-
 			resetTicks = new Timer {
 				Interval = 500,
 				Enabled = false,
 				AutoReset = false,
 			};
 			resetTicks.Elapsed += (sender, e) => ticks = 0;
-
-			plusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Value++);
-			plusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Value++);
-			minusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => Value--);
-			minusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => Value--);
 		}
 
 		public IImmutableDictionary<K, CounterData> Data
@@ -69,8 +45,6 @@ namespace TizenMtgCounter
 			set
 			{
 				data = value.ToDictionary((e) => e.Key, (e) => e.Value);
-
-				plusButton.IsVisible = minusButton.IsVisible = SelectedValid();
 
 				changeTimers = value.ToDictionary((p) => p.Key, (p) => new Timer {
 					Interval = changeInterval,
@@ -102,7 +76,6 @@ namespace TizenMtgCounter
 				if (!EqualityComparer<K>.Default.Equals(selected, value))
 				{
 					selected = value;
-					plusButton.IsVisible = minusButton.IsVisible = !EqualityComparer<K>.Default.Equals(value, default);
 					OnPropertyChanged("Value");
 					OnPropertyChanged("TextColor");
 					OnPropertyChanged("SelectedValid");

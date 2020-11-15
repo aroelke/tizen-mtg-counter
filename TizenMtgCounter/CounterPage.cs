@@ -5,6 +5,9 @@ using System.Linq;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
+using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
+using Label = Xamarin.Forms.Label;
+using NavigationPage = Xamarin.Forms.NavigationPage;
 
 namespace TizenMtgCounter
 {
@@ -16,6 +19,8 @@ namespace TizenMtgCounter
 		private readonly RelativeLayout layout;
 		private IDictionary<K, Label> labels;
 		private readonly CounterPopupEntry entry;
+		private readonly RepeatButton plusButton;
+		private readonly RepeatButton minusButton;
 
 		public CounterPage() : this(() => ImmutableDictionary<K, CounterData>.Empty) {}
 
@@ -28,6 +33,7 @@ namespace TizenMtgCounter
 			initialFocus = focus;
 			labels = new Dictionary<K, Label>();
 			Clear();
+
 			entry = new CounterPopupEntry {
 				Text = counter.Value.ToString(),
 				FontSize = 32,
@@ -36,10 +42,25 @@ namespace TizenMtgCounter
 				HorizontalTextAlignment = TextAlignment.Center,
 				IsVisible = counter.SelectedValid()
 			};
-			entry.Completed += (sender, e) => {
-				if (int.TryParse(entry.Text, out int result))
-					counter.Value = result;
+
+			plusButton = new RepeatButton {
+				Text = "+",
+				Delay = 500,
+				Interval = 100,
+				HorizontalOptions = LayoutOptions.Center,
+				WidthRequest = 60,
+				IsVisible = counter.SelectedValid()
 			};
+			plusButton.On<Xamarin.Forms.PlatformConfiguration.Tizen>().SetStyle(ButtonStyle.Text);
+			minusButton = new RepeatButton {
+				Text = "\u2212",
+				Delay = 500,
+				Interval = 100,
+				HorizontalOptions = LayoutOptions.Center,
+				WidthRequest = 60,
+				IsVisible = counter.SelectedValid()
+			};
+			minusButton.On<Xamarin.Forms.PlatformConfiguration.Tizen>().SetStyle(ButtonStyle.Text);
 
 			counter.PropertyChanged += (sender, e) => {
 				switch (e.PropertyName)
@@ -51,16 +72,34 @@ namespace TizenMtgCounter
 					entry.TextColor = counter.TextColor;
 					break;
 				case "SelectedValid":
-					entry.IsVisible = counter.SelectedValid();
+					minusButton.IsVisible = plusButton.IsVisible = entry.IsVisible = counter.SelectedValid();
 					break;
 				}
 			};
+			entry.Completed += (sender, e) => {
+				if (int.TryParse(entry.Text, out int result))
+					counter.Value = result;
+			};
+			plusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => counter.Value++);
+			plusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => counter.Value++);
+			minusButton.Pressed += (sender, e) => Device.BeginInvokeOnMainThread(() => counter.Value--);
+			minusButton.Held += (sender, e) => Device.BeginInvokeOnMainThread(() => counter.Value--);
 
 			Content = layout = new RelativeLayout();
 			layout.Children.Add(
 				entry,
 				Constraint.RelativeToParent((p) => (p.Width - p.GetSize(entry).Width)/2),
 				Constraint.RelativeToParent((p) => (p.Height - p.GetSize(entry).Height)/2)
+			);
+			layout.Children.Add(
+				plusButton,
+				Constraint.RelativeToParent((p) => (p.Width - p.GetSize(plusButton).Width)/2),
+				Constraint.RelativeToParent((p) => (p.Height - p.GetSize(entry).Height - p.GetSize(plusButton).Height)/2)
+			);
+			layout.Children.Add(
+				minusButton,
+				Constraint.RelativeToParent((p) => (p.Width - p.GetSize(minusButton).Width)/2),
+				Constraint.RelativeToParent((p) => (p.Height + p.GetSize(entry).Height - p.GetSize(minusButton).Height)/2)
 			);
 		}
 
