@@ -6,6 +6,7 @@ using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
+using Entry = Xamarin.Forms.Entry;
 using Label = Xamarin.Forms.Label;
 using NavigationPage = Xamarin.Forms.NavigationPage;
 
@@ -42,7 +43,6 @@ namespace TizenMtgCounter
 				HorizontalTextAlignment = TextAlignment.Center,
 				IsVisible = counter.SelectedValid()
 			};
-
 			plusButton = new RepeatButton {
 				Text = "+",
 				Delay = 500,
@@ -62,19 +62,13 @@ namespace TizenMtgCounter
 			};
 			minusButton.On<Xamarin.Forms.PlatformConfiguration.Tizen>().SetStyle(ButtonStyle.Text);
 
+			entry.SetBinding(Entry.TextProperty, "Value", BindingMode.OneWay);
+			entry.SetBinding(Entry.TextColorProperty, "TextColor", BindingMode.OneWay);
+			entry.BindingContext = counter;
+
 			counter.PropertyChanged += (sender, e) => {
-				switch (e.PropertyName)
-				{
-				case "Value":
-					entry.Text = counter.Value.ToString();
-					break;
-				case "TextColor":
-					entry.TextColor = counter.TextColor;
-					break;
-				case "SelectedValid":
+				if (e.PropertyName == "SelectedValid")
 					minusButton.IsVisible = plusButton.IsVisible = entry.IsVisible = counter.SelectedValid();
-					break;
-				}
 			};
 			entry.Completed += (sender, e) => {
 				if (int.TryParse(entry.Text, out int result))
