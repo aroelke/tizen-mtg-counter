@@ -15,7 +15,7 @@ namespace TizenMtgCounter
 			};
 			timer.Elapsed += (sender, e) => {
 				timer.Interval = Interval;
-				Held.Invoke(timer, e);
+				Held?.Invoke(timer, e);
 			};
 
 			Pressed += (sender, e) => {
