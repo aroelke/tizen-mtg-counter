@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Timers;
+using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
 
 namespace TizenMtgCounter
@@ -88,9 +89,40 @@ namespace TizenMtgCounter
 			};
 
 			history.Reset += (sender, e) => {
-				Clear();
-				mana.Clear();
-				history.Clear(); // Must come after resetting life counter so it doesn't record it
+				CircleStepper initial = new CircleStepper {
+					VerticalOptions = LayoutOptions.CenterAndExpand,
+					HorizontalOptions = LayoutOptions.Start,
+					Minimum = 0,
+					Maximum = 999,
+					Value = history.StartingLife,
+					IsWrapEnabled = false
+				};
+				TwoButtonPopup restart = new TwoButtonPopup {
+					Title = "Start a new game?",
+					Content = new StackLayout {
+						HorizontalOptions = LayoutOptions.FillAndExpand,
+						Orientation = StackOrientation.Vertical,
+						Children = { new Label { Text = "Starting life total:", FontSize = 8, HorizontalOptions = LayoutOptions.CenterAndExpand }, initial }
+					}
+				};
+				restart.FirstButton = new MenuItem {
+					IconImageSource = "cancel.png", // Icon made by Google from www.flaticon.com
+					Command = new Command(restart.Dismiss)
+				};
+				restart.SecondButton = new MenuItem {
+					IconImageSource = "confirm.png", // Icon made by Google from www.flaticon.com
+					Command = new Command(() => {
+						history.StartingLife = (int)initial.Value;
+
+						Clear();
+						mana.Clear();
+						history.Clear(); // Must come after resetting life counter so it doesn't record it
+
+						restart.Dismiss();
+					})
+				};
+				restart.BackButtonPressed += (s2, e2) => restart.Dismiss();
+				restart.Show();
 			};
 
 			manaPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(mana, true);

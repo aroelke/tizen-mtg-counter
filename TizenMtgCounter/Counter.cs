@@ -7,8 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Timers;
 using Tizen.Wearable.CircularUI.Forms;
 using Xamarin.Forms;
-using Xamarin.Forms.PlatformConfiguration.TizenSpecific;
-using Label = Xamarin.Forms.Label;
 
 namespace TizenMtgCounter
 {
