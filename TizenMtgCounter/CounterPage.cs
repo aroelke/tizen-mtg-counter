@@ -141,6 +141,12 @@ namespace TizenMtgCounter
 			layout.Children.Add(button, x, y, w, h);
 		}
 
+		public void AddButton(K key, ImageButton button, Func<RelativeLayout, double> r, double theta = 0) => AddButton(
+			key, button,
+			Constraint.RelativeToParent((p) => (p.Width - p.GetSize(button).Width)/2 + r(p)*Math.Cos(theta)),
+			Constraint.RelativeToParent((p) => (p.Height - p.GetSize(button).Height)/2 + r(p)*Math.Sin(theta))
+		);
+
 		public void AddButton(K key, ImageButton button, double theta = 0) => AddButton(
 			key, button,
 			Constraint.RelativeToParent((p) => (p.Width - p.GetSize(button).Width)/2*(1 + Math.Cos(theta))),

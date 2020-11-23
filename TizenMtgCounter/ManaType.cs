@@ -16,8 +16,8 @@ namespace TizenMtgCounter
 
 		private ManaType() {}
 
-		private string Name { get; set; }
+		public string Name { get; private set; }
 
-		public string ImageSource { get => Name + "_mana.png"; }
+		public string ImageSource => Name + "_mana.png";
 	}
 }

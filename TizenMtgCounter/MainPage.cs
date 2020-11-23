@@ -14,7 +14,7 @@ namespace TizenMtgCounter
 
 		private readonly HistoryPage history;
 
-		public MainPage(ManaPage mana, HistoryPage h) : base(() => new Dictionary<int, CounterData>() {
+		public MainPage(ManaPage m, AdditionalPage a, HistoryPage h) : base(() => new Dictionary<int, CounterData>() {
 			[LIFE] = new CounterData { Value = h.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) } },
 			[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) } }
 		}.ToImmutableDictionary(), LIFE)
@@ -34,6 +34,12 @@ namespace TizenMtgCounter
 				HeightRequest = 60,
 				CornerRadius = 30
 			};
+			ImageButton additionalPageButton = new ImageButton {
+				Source = "additional.png",
+				WidthRequest = 60,
+				HeightRequest = 60,
+				CornerRadius = 30
+			};
 			ImageButton historyPageButton = new ImageButton {
 				Source = "history.png", // Icon made by Google from www.flaticon.com
 				WidthRequest = 45,
@@ -46,8 +52,9 @@ namespace TizenMtgCounter
 				(p) => (p.Width - Math.Max(p.GetSize(Labels[POISON]).Width, p.GetSize(Labels[POISON]).Height))/2 - 55,
 				5*Math.PI/4
 			);
-			Children.Add(manaPageButton, (p) => (p.Width - 60)/2, 0);
-			Children.Add(historyPageButton, (p) => (p.Width - 45)/2, 3*Math.PI/2);
+			Children.Add(manaPageButton, (p) => (p.Width - p.GetSize(manaPageButton).Width)/2, 0);
+			Children.Add(additionalPageButton, (p) => (p.Width - p.GetSize(additionalPageButton).Width)/2, Math.PI);
+			Children.Add(historyPageButton, (p) => (p.Width - p.GetSize(historyPageButton).Width)/2, 3*Math.PI/2);
 
 			counter.ValueChanged += (sender, e) => {
 				if (e.Key == LIFE)
@@ -115,7 +122,8 @@ namespace TizenMtgCounter
 						history.StartingLife = (int)initial.Value;
 
 						Clear();
-						mana.Clear();
+						m.Clear();
+						a.Clear();
 						history.Clear(); // Must come after resetting life counter so it doesn't record it
 
 						restart.Dismiss();
@@ -125,9 +133,13 @@ namespace TizenMtgCounter
 				restart.Show();
 			};
 
-			manaPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(mana, true);
+			manaPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(m, true);
 			manaPageButton.Pressed += (sender, e) => manaPageButton.Opacity = 1.0/3.0;
 			manaPageButton.Released += (sender, e) => manaPageButton.Opacity = 1;
+
+			additionalPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(a, true);
+			additionalPageButton.Pressed += (sender, e) => additionalPageButton.Opacity = 1.0/3.0;
+			additionalPageButton.Released += (sender, e) => additionalPageButton.Opacity = 1;
 
 			historyPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(history, true);
 			historyPageButton.Pressed += (sender, e) => historyPageButton.Opacity = 1.0/3.0;
