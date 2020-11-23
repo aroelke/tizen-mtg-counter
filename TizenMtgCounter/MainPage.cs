@@ -54,7 +54,7 @@ namespace TizenMtgCounter
 			);
 			Children.Add(manaPageButton, (p) => (p.Width - p.GetSize(manaPageButton).Width)/2, 0);
 			Children.Add(additionalPageButton, (p) => (p.Width - p.GetSize(additionalPageButton).Width)/2, Math.PI);
-			Children.Add(historyPageButton, (p) => (p.Width - p.GetSize(historyPageButton).Width)/2, 3*Math.PI/2);
+			Children.Add(historyPageButton, (p) => (p.Width - p.GetSize(historyPageButton).Width)/2, Math.PI/2);
 
 			counter.ValueChanged += (sender, e) => {
 				if (e.Key == LIFE)
