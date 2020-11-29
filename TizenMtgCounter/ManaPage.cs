@@ -13,7 +13,7 @@ namespace TizenMtgCounter
 			for (int i = 0; i < ManaType.Values.Count; i++)
 			{
 				ManaType t = ManaType.Values[i];
-				ImageButton button = new ImageButton {
+				DarkenButton button = new DarkenButton {
 					Source = t.ImageSource,
 					WidthRequest = ButtonSize,
 					HeightRequest = ButtonSize,

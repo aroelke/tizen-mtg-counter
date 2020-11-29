@@ -21,32 +21,32 @@ namespace TizenMtgCounter
 		{
 			history = h;
 
-			ImageButton poisonButton = new ImageButton
+			DarkenButton poisonButton = new DarkenButton
 			{
 				Source = "poison.png", // Image by reptiletc
 				WidthRequest = 70,
 				HeightRequest = 70,
 				CornerRadius = 35
 			};
-			ImageButton commanderPageButton = new ImageButton {
+			DarkenButton commanderPageButton = new DarkenButton {
 				Source = "commander.png",
 				WidthRequest = 45,
 				HeightRequest = 45,
 				CornerRadius = 0
 			};
-			ImageButton manaPageButton = new ImageButton {
+			DarkenButton manaPageButton = new DarkenButton {
 				Source = "mana.png",
 				WidthRequest = 60,
 				HeightRequest = 60,
 				CornerRadius = 30
 			};
-			ImageButton additionalPageButton = new ImageButton {
+			DarkenButton additionalPageButton = new DarkenButton {
 				Source = "additional.png",
 				WidthRequest = 60,
 				HeightRequest = 60,
 				CornerRadius = 30
 			};
-			ImageButton historyPageButton = new ImageButton {
+			DarkenButton historyPageButton = new DarkenButton {
 				Source = "history.png", // Icon made by Google from www.flaticon.com
 				WidthRequest = 45,
 				HeightRequest = 45
@@ -82,12 +82,10 @@ namespace TizenMtgCounter
 				});
 			};
 			poisonButton.Pressed += (sender, e) => {
-				poisonButton.Opacity = 1.0/3.0;
 				if (counter.Selected == LIFE)
 					maximizeTimer.Start();
 			};
 			poisonButton.Released += (sender, e) => {
-				poisonButton.Opacity = 1;
 				maximizeTimer.Stop();
 				if (!maximize)
 				{
@@ -141,20 +139,9 @@ namespace TizenMtgCounter
 			};
 
 			commanderPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(c, true);
-			commanderPageButton.Pressed += (sender, e) => commanderPageButton.Opacity = 1.0/3.0;
-			commanderPageButton.Released += (sender, e) => commanderPageButton.Opacity = 1;
-
 			manaPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(m, true);
-			manaPageButton.Pressed += (sender, e) => manaPageButton.Opacity = 1.0/3.0;
-			manaPageButton.Released += (sender, e) => manaPageButton.Opacity = 1;
-
 			additionalPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(a, true);
-			additionalPageButton.Pressed += (sender, e) => additionalPageButton.Opacity = 1.0/3.0;
-			additionalPageButton.Released += (sender, e) => additionalPageButton.Opacity = 1;
-
 			historyPageButton.Clicked += async (sender, e) => await Navigation.PushAsync(history, true);
-			historyPageButton.Pressed += (sender, e) => historyPageButton.Opacity = 1.0/3.0;
-			historyPageButton.Released += (sender, e) => historyPageButton.Opacity = 1;
 		}
 	}
 }
