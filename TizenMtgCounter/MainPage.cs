@@ -127,6 +127,7 @@ namespace TizenMtgCounter
 						history.StartingLife = (int)initial.Value;
 
 						Clear();
+						c.Clear();
 						m.Clear();
 						a.Clear();
 						history.Clear(); // Must come after resetting life counter so it doesn't record it
