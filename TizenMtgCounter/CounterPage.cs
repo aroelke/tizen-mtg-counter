@@ -44,7 +44,7 @@ namespace TizenMtgCounter
 				IsVisible = counter.SelectedValid()
 			};
 			plusButton = new RepeatButton {
-				Text = "+",
+				Text = "\u25b2",
 				Delay = 500,
 				Interval = 100,
 				HorizontalOptions = LayoutOptions.Center,
@@ -53,7 +53,7 @@ namespace TizenMtgCounter
 			};
 			plusButton.On<Xamarin.Forms.PlatformConfiguration.Tizen>().SetStyle(ButtonStyle.Text);
 			minusButton = new RepeatButton {
-				Text = "\u2212",
+				Text = "\u25bc",
 				Delay = 500,
 				Interval = 100,
 				HorizontalOptions = LayoutOptions.Center,
