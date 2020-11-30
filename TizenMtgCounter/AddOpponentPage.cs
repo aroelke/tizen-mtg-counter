@@ -37,7 +37,7 @@ namespace TizenMtgCounter
 					img.SetBinding(ImageButton.SourceProperty, "File");
 					img.Clicked += (sender, e) => {
 						CommanderPage.AddOpponent(img.Source);
-						Navigation.PopAsync();
+						Navigation.PopAsync(true);
 					};
 					return new ViewCell { View = new StackLayout { Children = { img }, Padding = new Thickness(10), HeightRequest = 100 }};
 				}),

@@ -133,6 +133,7 @@ namespace TizenMtgCounter
 						history.Clear(); // Must come after resetting life counter so it doesn't record it
 
 						restart.Dismiss();
+						Navigation.PopAsync(true);
 					})
 				};
 				restart.BackButtonPressed += (s2, e2) => restart.Dismiss();
