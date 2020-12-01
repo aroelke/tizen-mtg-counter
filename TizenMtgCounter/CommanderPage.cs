@@ -8,54 +8,59 @@ namespace TizenMtgCounter
 {
 	public class CommanderPage : CounterPage<int>
 	{
-		private class CommanderTax
-		{
-			public int Tax { get; set; }
-			public DarkenButton Button { get; set; }
-		}
-
-		private readonly CommanderTax left;
-		private readonly CommanderTax right;
+		private int leftTax;
+		private int rightTax;
 		private readonly DarkenButton[] buttons;
 		private int opponents;
 		private readonly Button addButton;
 
 		public CommanderPage() : base(() => Enumerable.Range(0, 8).ToImmutableDictionary((i) => i + 1, (i) => new CounterData { Value = 0, Minimum = 0, Thresholds = { (20, Color.Default), (int.MaxValue, Color.Red) }}))
 		{
-			CommanderTax createTaxButton()
-			{
-				bool clear = false;
-				CommanderTax t = new CommanderTax {
-					Tax = 0,
-					Button = new DarkenButton {
-						Source = "0_mana.png",
-						WidthRequest = 60,
-						HeightRequest = 60,
-						CornerRadius = 30
-					}
-				};
-				Timer timer = new Timer {
-					Interval = 500,
-					Enabled = false,
-					AutoReset = false
-				};
-				timer.Elapsed += (sender, e) => clear = true;
+			leftTax = rightTax = 0;
 
-				t.Button.Pressed += (sender, e) => timer.Start();
-				t.Button.Released += (sender, e) => {
-					timer.Stop();
-					t.Tax = clear ? 0 : t.Tax + 2;
-					clear = false;
-					t.Button.Source = t.Tax <= 20 ? $"{t.Tax}_mana.png" : "infinity_mana.png";
-				};
+			bool leftClear = false;
+			DarkenButton leftButton = new DarkenButton {
+				WidthRequest = 60,
+				HeightRequest = 60,
+				CornerRadius = 30
+			};
+			leftButton.SetBinding(ImageButton.SourceProperty, "LeftButtonSource", BindingMode.OneWay);
+			leftButton.BindingContext = this;
+			Timer leftTimer = new Timer {
+				Interval = 500,
+				Enabled = false,
+				AutoReset = false
+			};
+			leftTimer.Elapsed += (sender, e) => leftClear = true;
+			leftButton.Pressed += (sender, e) => leftTimer.Start();
+			leftButton.Released += (sender, e) => {
+				leftTimer.Stop();
+				LeftTax = leftClear ? 0 : LeftTax + 2;
+				leftClear = false;
+			};
+			Children.Add(leftButton, (p) => (p.Width - p.GetSize(leftButton).Width)/2, Math.PI);
 
-				return t;
-			}
-
-			left = createTaxButton();
-			right = createTaxButton();
-			Children.Add(left.Button, (p) => (p.Width - p.GetSize(left.Button).Width)/2, Math.PI);
-			Children.Add(right.Button, (p) => (p.Width - p.GetSize(right.Button).Width)/2, 0);
+			bool rightClear = false;
+			DarkenButton rightButton = new DarkenButton {
+				WidthRequest = 60,
+				HeightRequest = 60,
+				CornerRadius = 30
+			};
+			rightButton.SetBinding(ImageButton.SourceProperty, "RightButtonSource", BindingMode.OneWay);
+			rightButton.BindingContext = this;
+			Timer rightTimer = new Timer {
+				Interval = 500,
+				Enabled = false,
+				AutoReset = false
+			};
+			rightTimer.Elapsed += (sender, e) => rightClear = true;
+			rightButton.Pressed += (sender, e) => leftTimer.Start();
+			rightButton.Released += (sender, e) => {
+				rightTimer.Stop();
+				RightTax = rightClear ? 0 : RightTax + 2;
+				rightClear = false;
+			};
+			Children.Add(rightButton, (p) => (p.Width - p.GetSize(rightButton).Width)/2, 0);
 
 			double theta = Math.PI/6;
 			buttons = new DarkenButton[counter.Data.Count];
@@ -95,6 +100,36 @@ namespace TizenMtgCounter
 			Children.Add(removeButton, (p) => (p.Width - p.GetSize(removeButton).Height)/2, Math.PI/2);
 		}
 
+		public int LeftTax
+		{
+			get => leftTax;
+			set
+			{
+				if (value != leftTax)
+				{
+					leftTax = value;
+					OnPropertyChanged("LeftButtonSource");
+				}
+			}
+		}
+
+		public int RightTax
+		{
+			get => rightTax;
+			set
+			{
+				if (value != rightTax)
+				{
+					rightTax = value;
+					OnPropertyChanged("RightButtonSource");
+				}
+			}
+		}
+
+		public FileImageSource LeftButtonSource => leftTax <= 20 ? $"{leftTax}_mana.png" : "infinity_mana.png";
+
+		public FileImageSource RightButtonSource => rightTax <= 20 ? $"{rightTax}_mana.png" : "infinity_mana.png";
+
 		public void AddOpponent(ImageSource source)
 		{
 			buttons[opponents].Source = source;
@@ -119,11 +154,7 @@ namespace TizenMtgCounter
 		public override void Clear()
 		{
 			base.Clear();
-			if (left != null && right != null)
-			{
-				left.Tax = right.Tax = 0;
-				left.Button.Source = right.Button.Source = "0_mana.png";
-			}
+			LeftTax = RightTax = 0;
 			foreach (Label l in Labels.Values)
 				l.IsVisible = false;
 			if (buttons != null)
