@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+using Tizen.System;
 using Xamarin.Forms;
 
 namespace TizenMtgCounter
@@ -13,6 +15,24 @@ namespace TizenMtgCounter
 				new AdditionalPage(),
 				new HistoryPage { StartingLife = 20 }
 			)) });
+		}
+
+		protected override void OnTerminate()
+		{
+			base.OnTerminate();
+			DevicePower.ReleaseLock(DevicePower.DISPLAY);
+		}
+
+		protected override void OnResume()
+		{
+			base.OnResume();
+			DevicePower.RequestLock(DevicePower.DISPLAY, 0);
+		}
+
+		protected override void OnPause()
+		{
+			base.OnPause();
+			DevicePower.ReleaseLock(DevicePower.DISPLAY);
 		}
 
 		static void Main(string[] args)

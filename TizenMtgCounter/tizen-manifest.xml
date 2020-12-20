@@ -8,6 +8,9 @@
         <splash-screens />
     </ui-application>
     <shortcut-list />
+    <privileges>
+        <privilege>http://tizen.org/privilege/display</privilege>
+    </privileges>
     <dependencies />
     <provides-appdefined-privileges />
     <feature name="http://tizen.org/feature/screen.shape.circle">true</feature>
