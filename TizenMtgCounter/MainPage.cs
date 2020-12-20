@@ -52,16 +52,16 @@ namespace TizenMtgCounter
 				HeightRequest = 45
 			};
 
-			Children.Add(poisonButton, (p) => (p.Width - p.GetSize(poisonButton).Width)/2, 5*Math.PI/4);
+			Children.Add(historyPageButton, (p) => (p.Width - p.GetSize(historyPageButton).Width)/2, Math.PI/2);
+			Children.Add(additionalPageButton, (p) => (p.Width - p.GetSize(additionalPageButton).Width)/2, Math.PI/2 + 2*Math.PI/5);
+			Children.Add(poisonButton, (p) => (p.Width - p.GetSize(poisonButton).Width)/2, Math.PI/2 + 4*Math.PI/5);
 			Children.Add(
 				Labels[POISON],
 				(p) => (p.Width - Math.Max(p.GetSize(Labels[POISON]).Width, p.GetSize(Labels[POISON]).Height))/2 - 55,
-				5*Math.PI/4
+				Math.PI/2 + 4*Math.PI/5
 			);
-			Children.Add(commanderPageButton, (p) => (p.Width - p.GetSize(commanderPageButton).Width*Math.Sqrt(2))/2, -Math.PI/4);
-			Children.Add(manaPageButton, (p) => (p.Width - p.GetSize(manaPageButton).Width)/2, 0);
-			Children.Add(additionalPageButton, (p) => (p.Width - p.GetSize(additionalPageButton).Width)/2, Math.PI);
-			Children.Add(historyPageButton, (p) => (p.Width - p.GetSize(historyPageButton).Width)/2, Math.PI/2);
+			Children.Add(commanderPageButton, (p) => (p.Width - p.GetSize(commanderPageButton).Width*Math.Sqrt(2))/2, Math.PI/2 + 6*Math.PI/5);
+			Children.Add(manaPageButton, (p) => (p.Width - p.GetSize(manaPageButton).Width)/2, Math.PI/2 + 8*Math.PI/5);
 
 			counter.ValueChanged += (sender, e) => {
 				if (e.Key == LIFE)
