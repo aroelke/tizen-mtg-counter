@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Immutable;
-using Xamarin.Forms;
 
 namespace TizenMtgCounter
 {

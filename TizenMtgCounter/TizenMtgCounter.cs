@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-using Tizen.System;
 using Xamarin.Forms;
 
 namespace TizenMtgCounter
