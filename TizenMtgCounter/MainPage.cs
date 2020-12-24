@@ -14,12 +14,15 @@ namespace TizenMtgCounter
 
 		private readonly HistoryPage history;
 
-		public MainPage(CommanderPage c, ManaPage m, AdditionalPage a, HistoryPage h) : base(() => new Dictionary<int, CounterData>() {
+		public MainPage(HistoryPage h) : base(() => new Dictionary<int, CounterData>() {
 			[LIFE] = new CounterData { Value = h.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) } },
 			[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) } }
 		}.ToImmutableDictionary(), LIFE)
 		{
 			history = h;
+			CommanderPage c = new CommanderPage();
+			ManaPage m = new ManaPage();
+			AdditionalPage a = new AdditionalPage();
 
 			DarkenButton poisonButton = new DarkenButton
 			{
