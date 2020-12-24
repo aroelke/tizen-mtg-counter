@@ -39,9 +39,9 @@ namespace TizenMtgCounter
 			};
 			DarkenButton manaPageButton = new DarkenButton {
 				Source = "mana.png",
-				WidthRequest = 60,
-				HeightRequest = 60,
-				CornerRadius = 30
+				WidthRequest = ManaPage.ButtonSize,
+				HeightRequest = ManaPage.ButtonSize,
+				CornerRadius = ManaPage.ButtonSize/2
 			};
 			DarkenButton additionalPageButton = new DarkenButton {
 				Source = "additional.png",
@@ -64,7 +64,7 @@ namespace TizenMtgCounter
 				Math.PI/2 + 4*Math.PI/5
 			);
 			Children.Add(commanderPageButton, (p) => (p.Width - p.GetSize(commanderPageButton).Width*Math.Sqrt(2))/2, Math.PI/2 + 6*Math.PI/5);
-			Children.Add(manaPageButton, (p) => (p.Width - p.GetSize(manaPageButton).Width)/2, Math.PI/2 + 8*Math.PI/5);
+			Children.Add(manaPageButton, (p) => (p.Width - ManaPage.ButtonSize)/2 - ManaPage.ButtonOffset, Math.PI/2 + 8*Math.PI/5);
 
 			counter.ValueChanged += (sender, e) => {
 				if (e.Key == LIFE)
