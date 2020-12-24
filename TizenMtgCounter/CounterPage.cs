@@ -30,10 +30,16 @@ namespace TizenMtgCounter
 			NavigationPage.SetHasNavigationBar(this, false);
 
 			RotaryFocusObject = counter = new Counter<K>();
-			initialValues = initial;
-			initialFocus = focus;
-			labels = new Dictionary<K, Label>();
-			Clear();
+			counter.Data = (initialValues = initial)();
+			counter.Selected = initialFocus = focus;
+			labels = counter.Data.ToDictionary((e) => e.Key, (e) => {
+				Label l = new Label { FontSize = 8 };
+				l.SetBinding(Label.TextProperty, "Value");
+				l.SetBinding(Label.TextColorProperty, "TextColor");
+				l.BindingContext = e.Value;
+				l.IsVisible = true;
+				return l;
+			});
 
 			entry = new CounterPopupEntry {
 				Text = counter.Value.ToString(),
@@ -151,20 +157,7 @@ namespace TizenMtgCounter
 
 		public virtual void Clear()
 		{
-			var initial = initialValues();
-			counter.Data = initial;
-			labels = labels.Where((e) => initial.ContainsKey(e.Key)).ToDictionary((e) => e.Key, (e) => e.Value);
-			foreach (K key in initial.Keys)
-			{
-				if (!labels.ContainsKey(key))
-				{
-					labels[key] = new Label { FontSize = 8 };
-					labels[key].SetBinding(Label.TextProperty, "Value");
-					labels[key].SetBinding(Label.TextColorProperty, "TextColor");
-				}
-				labels[key].BindingContext = initial[key];
-				labels[key].IsVisible = true;
-			}
+			counter.Data = initialValues();
 			counter.Selected = initialFocus;
 		}
 	}

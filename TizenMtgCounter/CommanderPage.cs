@@ -157,9 +157,8 @@ namespace TizenMtgCounter
 			LeftTax = RightTax = 0;
 			foreach (Label l in Labels.Values)
 				l.IsVisible = false;
-			if (buttons != null)
-				foreach (DarkenButton b in buttons)
-					b.IsVisible = false;
+			foreach (DarkenButton b in buttons)
+				b.IsVisible = false;
 			opponents = 0;
 		}
 	}
