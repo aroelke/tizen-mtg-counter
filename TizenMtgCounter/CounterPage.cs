@@ -149,12 +149,6 @@ namespace TizenMtgCounter
 			Constraint.RelativeToParent((p) => (p.Height - p.GetSize(button).Height)/2 + r(p)*Math.Sin(theta))
 		);
 
-		public void AddButton(K key, ImageButton button, double theta = 0) => AddButton(
-			key, button,
-			Constraint.RelativeToParent((p) => (p.Width - p.GetSize(button).Width)/2*(1 + Math.Cos(theta))),
-			Constraint.RelativeToParent((p) => (p.Height - p.GetSize(button).Height)/2*(1 + Math.Sin(theta)))
-		);
-
 		public virtual void Clear()
 		{
 			counter.Data = initialValues();
