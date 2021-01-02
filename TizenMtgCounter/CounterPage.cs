@@ -109,35 +109,52 @@ namespace TizenMtgCounter
 
 		public void AddButton(K key, ImageButton button, Constraint x = null, Constraint y = null, Constraint w = null, Constraint h = null)
 		{
+			bool clear = false;
+			bool maximized = false;
+
 			Timer timer = new Timer {
 				Interval = 500,
 				Enabled = false,
-				AutoReset = false
+				AutoReset = true
 			};
-			timer.Elapsed += (sender, e) => Device.BeginInvokeOnMainThread(() => counter[key] = 0);
+			timer.Elapsed += (sender, e) => Device.BeginInvokeOnMainThread(() => {
+				if (clear)
+				{
+					counter[key] = 0;
+					timer.AutoReset = false;
+				}
+				else if (!EqualityComparer<K>.Default.Equals(counter.Selected, key))
+				{
+					if (counter.SelectedValid())
+						labels[counter.Selected].IsVisible = true;
+					counter.Selected = key;
+					labels[key].IsVisible = false;
+					entry.IsVisible = true;
+				}
+				maximized = clear = true;
+			});
 
-			button.Pressed += (sender, e) => timer.Start();
+			button.Pressed += (sender, e) => {
+				clear = EqualityComparer<K>.Default.Equals(counter.Selected, key);
+				maximized = false;
+				timer.AutoReset = true;
+				timer.Start();
+			};
 
 			button.Released += (sender, e) => {
-				if (timer.Enabled)
+				timer.Stop();
+				if (!maximized)
 				{
-					timer.Stop();
-
 					if (EqualityComparer<K>.Default.Equals(counter.Selected, key))
 					{
 						counter.Selected = default;
 						labels[key].IsVisible = true;
 						entry.IsVisible = false;
 					}
-					else
-					{
-						if (counter.SelectedValid())
-							labels[counter.Selected].IsVisible = true;
-						counter.Selected = key;
-						labels[key].IsVisible = false;
-						entry.IsVisible = true;
-					}
+					else if (!clear)
+						counter[key]++;
 				}
+				maximized = clear = false;
 			};
 
 			layout.Children.Add(button, x, y, w, h);
