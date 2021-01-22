@@ -6,7 +6,8 @@ namespace TizenMtgCounter
 {
 	public class AdditionalPage : CounterPage<AdditionalState>
 	{
-		private const int ButtonSize = 50;
+		private const int ButtonSize = 60;
+		private const int ButtonOffset = 5;
 
 		public AdditionalPage() : base(() => AdditionalState.Values.ToImmutableDictionary((s) => s, (s) => new CounterData { Value = 0, Minimum = 0 }))
 		{
@@ -19,10 +20,10 @@ namespace TizenMtgCounter
 					HeightRequest = ButtonSize,
 					CornerRadius = 0
 				};
-				AddButton(AdditionalState.Values[i], button, (p) => p.Width/2 - ButtonSize*Math.Sqrt(2)/2, (i - 2)*Math.PI/2 + Math.PI/4);
+				AddButton(AdditionalState.Values[i], button, (p) => (p.Width - ButtonSize)/2 - ButtonOffset, (i - 2)*Math.PI/2 + Math.PI/4);
 				Children.Add(
 					Labels[s],
-					(p) => (p.Width - Math.Max(p.GetSize(Labels[s]).Width, p.GetSize(Labels[s]).Height))/2 - ButtonSize*Math.Sqrt(2),
+					(p) => (p.Width - Math.Max(p.GetSize(Labels[s]).Width, p.GetSize(Labels[s]).Height))/2 - ButtonSize - ButtonOffset,
 					(i - 2)*Math.PI/2 + Math.PI/4
 				);
 			}
