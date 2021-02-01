@@ -9,6 +9,9 @@ using NavigationPage = Xamarin.Forms.NavigationPage;
 
 namespace TizenMtgCounter
 {
+	/// <summary>
+	/// Application page for tracking history of life changes and resetting all counters.
+	/// </summary>
 	public class HistoryPage : BezelInteractionPage
 	{
 		private const int LabelSpacing = 32;
@@ -19,6 +22,9 @@ namespace TizenMtgCounter
 		private readonly List<Label> historyLabels;
 		private readonly StackLayout historyList;
 
+		/// <summary>
+		/// Create a new <c>HistoryPage</c> with a default <see cref="StartingLife"/> of 0.
+		/// </summary>
 		public HistoryPage() : base()
 		{
 			NavigationPage.SetHasNavigationBar(this, false);
@@ -47,6 +53,9 @@ namespace TizenMtgCounter
 			RotaryFocusObject = scroll;
 		}
 
+		/// <summary>
+		/// Clear the life total history.
+		/// </summary>
 		public void Clear()
 		{
 			changes.Clear();
@@ -55,6 +64,9 @@ namespace TizenMtgCounter
 			historyList.Children.Add(startLabel);
 		}
 
+		/// <summary>
+		/// Get or set the starting life total when resetting the <see cref="MainPage"/> counters.
+		/// </summary>
 		public int StartingLife
 		{
 			get => starting;
@@ -67,6 +79,10 @@ namespace TizenMtgCounter
 			}
 		}
 
+		/// <summary>
+		/// Add a life total change to the history.
+		/// </summary>
+		/// <param name="n">Amount of life that was gained or lost.</param>
 		public void AddChange(int n)
 		{
 			changes.Add(n);
@@ -92,6 +108,9 @@ namespace TizenMtgCounter
 			historyList.Children.Add(row);
 		}
 
+		/// <summary>
+		/// Occurs whenever the reset button is pressed.
+		/// </summary>
 		public event EventHandler Reset;
 	}
 }
