@@ -6,10 +6,20 @@ using Xamarin.Forms;
 
 namespace TizenMtgCounter
 {
+	/// <summary>
+	/// Application page useful for tracking damage from opposing commanders.
+	/// A user can add or remove up to 8 counters with customizable icons. Also includes buttons for tracking "commander taxes."
+	/// Note that only increments of 2 are supported for taxes.
+	/// </summary>
 	public class CommanderPage : CounterPage<int>
 	{
+		/// <summary>Size of the buttons for adding or removing opponents.</summary>
+		public const int OpponentButtonSize = 60;
+		/// <summary>Size of the commander tax buttons.</summary>
 		public const int TaxButtonSize = 60;
+		/// <summary>Size of the commander damage buttons.</summary>
 		public const int DamageButtonSize = 45;
+		/// <summary>Distance from the edge of the screen to display buttons.</summary>
 		public const int ButtonOffset = 5;
 
 		private int leftTax;
@@ -18,6 +28,9 @@ namespace TizenMtgCounter
 		private int opponents;
 		private readonly DarkenButton addButton;
 
+		/// <summary>
+		/// Create a new <c>CommanderPage</c> with no visible opponents and zero commander tax.
+		/// </summary>
 		public CommanderPage() : base(() => Enumerable.Range(0, 8).ToImmutableDictionary((i) => i + 1, (i) => new CounterData { Value = 0, Minimum = 0, Thresholds = { (20, Color.Default), (int.MaxValue, Color.Red) }}))
 		{
 			leftTax = rightTax = 0;
@@ -94,7 +107,7 @@ namespace TizenMtgCounter
 			AddOpponentPage addPage = new AddOpponentPage { CommanderPage = this };
 			addButton = new DarkenButton {
 				Source = "add.png", // (part of) icon by Pixel perfect from flaticon.com
-				WidthRequest = TaxButtonSize
+				WidthRequest = OpponentButtonSize
 			};
 			addButton.Clicked += async (sender, e) => {
 				if (opponents < counter.Data.Count)
@@ -104,12 +117,15 @@ namespace TizenMtgCounter
 
 			DarkenButton removeButton = new DarkenButton {
 				Source = "remove.png", // (part of) icon by Pixel perfect from flaticon.com
-				WidthRequest = TaxButtonSize,
+				WidthRequest = OpponentButtonSize,
 			};
 			removeButton.Clicked += (sender, e) => RemoveOpponent();
 			Children.Add(removeButton, (p) => (p.Width - p.GetSize(removeButton).Height)/2 - ButtonOffset, Math.PI/2);
 		}
 
+		/// <summary>
+		/// Gets or sets the tax of the left counter.
+		/// </summary>
 		public int LeftTax
 		{
 			get => leftTax;
@@ -123,6 +139,9 @@ namespace TizenMtgCounter
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the tax of the right counter.
+		/// </summary>
 		public int RightTax
 		{
 			get => rightTax;
@@ -136,10 +155,20 @@ namespace TizenMtgCounter
 			}
 		}
 
+		/// <summary>
+		/// Gets the image file to be used for the left tax button.
+		/// </summary>
 		public FileImageSource LeftButtonSource => leftTax <= 20 ? $"{leftTax}_mana.png" : "infinity_mana.png";
 
+		/// <summary>
+		/// Gets the image file to be used for the right tax button.
+		/// </summary>
 		public FileImageSource RightButtonSource => rightTax <= 20 ? $"{rightTax}_mana.png" : "infinity_mana.png";
 
+		/// <summary>
+		/// Add a new opponent. New opponents are added clockwise starting from the top of the screen.
+		/// </summary>
+		/// <param name="source">Icon to use to represent the new opponent.</param>
 		public void AddOpponent(ImageSource source)
 		{
 			buttons[opponents].Source = source;
@@ -148,6 +177,9 @@ namespace TizenMtgCounter
 			Labels[opponents].IsVisible = true;
 		}
 
+		/// <summary>
+		/// Remove the last opponent that was added.
+		/// </summary>
 		private void RemoveOpponent()
 		{
 			if (opponents > 0)
@@ -161,6 +193,9 @@ namespace TizenMtgCounter
 			}
 		}
 
+		/// <summary>
+		/// Remove all opponents and set both taxes to 0.
+		/// </summary>
 		public override void Clear()
 		{
 			base.Clear();
