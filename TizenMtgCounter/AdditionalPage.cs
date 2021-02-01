@@ -4,11 +4,20 @@ using Xamarin.Forms;
 
 namespace TizenMtgCounter
 {
+	/// <summary>
+	/// Application page for tracking miscellaneous game state.
+	/// </summary>
 	public class AdditionalPage : CounterPage<AdditionalState>
 	{
-		private const int ButtonSize = 60;
-		private const int ButtonOffset = 5;
+		/// <summary>Size of the buttons.</summary>
+		public const int ButtonSize = 60;
+		/// <summary>Offset from the edge of the screen to display buttons.</summary>
+		public const int ButtonOffset = 5;
 
+		/// <summary>
+		/// Create a new <c>AdditionalStatePage</c> to display the count for each <see cref="AdditionalState"/>.
+		/// This page will be populated with a button for each quantity and a count that defaults to 0.
+		/// </summary>
 		public AdditionalPage() : base(() => AdditionalState.Values.ToImmutableDictionary((s) => s, (s) => new CounterData { Value = 0, Minimum = 0 }))
 		{
 			for (int i = 0; i < AdditionalState.Values.Count; i++)
