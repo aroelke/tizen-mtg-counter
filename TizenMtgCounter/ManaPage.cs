@@ -3,11 +3,21 @@ using System.Collections.Immutable;
 
 namespace TizenMtgCounter
 {
+	/// <summary>
+	/// Application page for tracking contents of the mana pool.
+	/// </summary>
 	public class ManaPage : CounterPage<ManaType>
 	{
+		/// <summary>Size of the button for each mana type.</summary>
 		public const int ButtonSize = 60;
+		/// <summary>Offset of each button from the edge of the screen.</summary>
 		public const int ButtonOffset = 5;
 
+		/// <summary>
+		/// Creates a new ManaPage.
+		/// The page will be populated with a button for each of the six types of mana to track the amount of that mana in the mana pool
+		/// with an initial amount of 0 for each one.
+		/// </summary>
 		public ManaPage() : base(() => ManaType.Values.ToImmutableDictionary((m) => m, (m) => new CounterData { Value = 0, Minimum = 0 }))
 		{
 			for (int i = 0; i < ManaType.Values.Count; i++)
