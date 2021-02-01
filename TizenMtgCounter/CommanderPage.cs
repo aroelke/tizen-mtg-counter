@@ -16,7 +16,7 @@ namespace TizenMtgCounter
 		private int rightTax;
 		private readonly DarkenButton[] buttons;
 		private int opponents;
-		private readonly Button addButton;
+		private readonly DarkenButton addButton;
 
 		public CommanderPage() : base(() => Enumerable.Range(0, 8).ToImmutableDictionary((i) => i + 1, (i) => new CounterData { Value = 0, Minimum = 0, Thresholds = { (20, Color.Default), (int.MaxValue, Color.Red) }}))
 		{
@@ -92,14 +92,20 @@ namespace TizenMtgCounter
 			}
 
 			AddOpponentPage addPage = new AddOpponentPage { CommanderPage = this };
-			addButton = new Button { Text = "+" };
+			addButton = new DarkenButton {
+				Source = "add.png", // (part of) icon by Pixel perfect from flaticon.com
+				WidthRequest = TaxButtonSize
+			};
 			addButton.Clicked += async (sender, e) => {
 				if (opponents < counter.Data.Count)
 					await Navigation.PushAsync(addPage);
 			};
 			Children.Add(addButton, (p) => (p.Width - p.GetSize(addButton).Height)/2 - ButtonOffset, 3*Math.PI/2);
 
-			Button removeButton = new Button { Text = "-" };
+			DarkenButton removeButton = new DarkenButton {
+				Source = "remove.png", // (part of) icon by Pixel perfect from flaticon.com
+				WidthRequest = TaxButtonSize,
+			};
 			removeButton.Clicked += (sender, e) => RemoveOpponent();
 			Children.Add(removeButton, (p) => (p.Width - p.GetSize(removeButton).Height)/2 - ButtonOffset, Math.PI/2);
 		}
