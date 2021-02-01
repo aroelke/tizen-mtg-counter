@@ -5,8 +5,15 @@ using NavigationPage = Xamarin.Forms.NavigationPage;
 
 namespace TizenMtgCounter
 {
+	/// <summary>
+	/// Application page for customizing the opponent to add when adding a new opponent to the
+	/// <see cref="CommanderPage"/>.
+	/// </summary>
 	public class AddOpponentPage : ContentPage
 	{
+		/// <summary>
+		/// Create a new <c>AddOpponentPage</c> with a preset list of icons to choose from.
+		/// </summary>
 		public AddOpponentPage() : base()
 		{
 			NavigationPage.SetHasNavigationBar(this, false);
@@ -45,9 +52,13 @@ namespace TizenMtgCounter
 				VerticalOptions = LayoutOptions.CenterAndExpand
 			};
 
+			// Add an extra label at the top of the stack here so the text doesn't get cut off
 			Content = new StackLayout { Children = { new Label(), new Label { Text = "Choose an icon:", HorizontalOptions = LayoutOptions.CenterAndExpand }, carousel }};
 		}
 
+		/// <summary>
+		/// Gets or sets the <see cref="CommanderPage"/> where the new opponent will be added.
+		/// </summary>
 		public CommanderPage CommanderPage { get; set; }
 	}
 }
