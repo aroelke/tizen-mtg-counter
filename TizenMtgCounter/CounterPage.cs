@@ -12,6 +12,14 @@ using NavigationPage = Xamarin.Forms.NavigationPage;
 
 namespace TizenMtgCounter
 {
+	/// <summary>
+	/// Application page containing counters for tracking a player's game state.
+	/// Counters are maximized by tapping their corresponding buttons on the edge of the screen, followed
+	/// by either tapping the up/down arrow buttons or rotating the bezel. Counters can also be configured
+	/// to change color as they increase or decrease. Holding the button for a counter (or pressing the one
+	/// for another counter) minimizes it and holding the button longer resets it.
+	/// </summary>
+	/// <typeparam name="K">Type of data being counted.</typeparam>
 	public class CounterPage<K> : BezelInteractionPage
 	{
 		protected readonly Counter<K> counter;
@@ -23,8 +31,12 @@ namespace TizenMtgCounter
 		private readonly RepeatButton plusButton;
 		private readonly RepeatButton minusButton;
 
-		public CounterPage() : this(() => ImmutableDictionary<K, CounterData>.Empty) {}
-
+		/// <summary>
+		/// Create a CounterPage for counting various values.
+		/// </summary>
+		/// <param name="initial">Mapping of data to be counted onto its initial/reset value.</param>
+		/// <param name="focus">Which counter, if any, should start maximized. Leave as <c>default</c> to
+		/// start with no counter maximized.</param>
 		public CounterPage(Func<IImmutableDictionary<K, CounterData>> initial, K focus = default) : base()
 		{
 			NavigationPage.SetHasNavigationBar(this, false);
@@ -103,10 +115,25 @@ namespace TizenMtgCounter
 			);
 		}
 
+		/// <summary>
+		/// Gets the children of the page's layout.
+		/// </summary>
 		public RelativeLayout.IRelativeList<View> Children => layout.Children;
 
+		/// <summary>
+		/// Gets the labels showing the state of each counter.
+		/// </summary>
 		public IImmutableDictionary<K, Label> Labels => labels.ToImmutableDictionary();
 
+		/// <summary>
+		/// Add a new button for maximizing a particular counter.
+		/// </summary>
+		/// <param name="key">Counter value for the button to control.</param>
+		/// <param name="button">Button to add.</param>
+		/// <param name="x">x-coordinate within the screen.</param>
+		/// <param name="y">y-coordinate within the screen.</param>
+		/// <param name="w">Width of the button.</param>
+		/// <param name="h">Height of the button.</param>
 		public void AddButton(K key, ImageButton button, Constraint x = null, Constraint y = null, Constraint w = null, Constraint h = null)
 		{
 			bool clear = false;
@@ -160,6 +187,14 @@ namespace TizenMtgCounter
 			layout.Children.Add(button, x, y, w, h);
 		}
 
+		/// <summary>
+		/// Add a button for maximizing a particular counter using radial coordinates centered at the center of the screen
+		/// and center of the button.
+		/// </summary>
+		/// <param name="key">Counter value for the button to control.</param>
+		/// <param name="button">Button to add.</param>
+		/// <param name="r">Radius to add the button at.</param>
+		/// <param name="theta">Angle to add the button at.</param>
 		public void AddButton(K key, ImageButton button, Func<RelativeLayout, double> r, double theta = 0) => AddButton(
 			key, button,
 			Constraint.RelativeToParent((p) => (p.Width - p.GetSize(button).Width)/2 + r(p)*Math.Cos(theta)),
@@ -173,10 +208,28 @@ namespace TizenMtgCounter
 		}
 	}
 
+	/// <summary>
+	/// Extensions class for adding things to <see cref="RelativeLayout"/>s.
+	/// </summary>
 	public static class CounterPageLayoutExtensions
 	{
+		/// <summary>
+		/// Get the size of an item within a layout.
+		/// </summary>
+		/// <param name="v"><see cref="RelativeLayout"/> containing the item to measure.</param>
+		/// <param name="view">Item to measure.</param>
+		/// <returns>The size of the item.</returns>
 		public static Size GetSize(this View v, View view) => new Size(view.Measure(v.Width, v.Height).Request.Width, view.Measure(v.Width, v.Height).Request.Height);
 
+		/// <summary>
+		/// Add an item to the layout using radial coordinates centered at the center of the layout and center of the item.
+		/// </summary>
+		/// <param name="children"><see cref="RelativeLayout.IRelativeList{T}"/> to add the item to.</param>
+		/// <param name="view">Item to add.</param>
+		/// <param name="r">Radius to add the item at.</param>
+		/// <param name="theta">Angle to add the item at.</param>
+		/// <param name="w">Width of the item.</param>
+		/// <param name="h">Height of the item.</param>
 		public static void Add(this RelativeLayout.IRelativeList<View> children, View view, double r, double theta, Constraint w = null, Constraint h = null)
 		{
 			children.Add(view,
@@ -186,6 +239,15 @@ namespace TizenMtgCounter
 			);
 		}
 
+		/// <summary>
+		/// Add an item to the layout using radial coordinates centered at the center of the layout and center of the item.
+		/// </summary>
+		/// <param name="children"><see cref="RelativeLayout.IRelativeList{T}"/> to add the item to.</param>
+		/// <param name="view">Item to add.</param>
+		/// <param name="r">Function providing the radius to add the item at.</param>
+		/// <param name="theta">Angle to add the item at.</param>
+		/// <param name="w">Width of the item.</param>
+		/// <param name="h">Height of the item.</param>
 		public static void Add(this RelativeLayout.IRelativeList<View> children, View view, Func<RelativeLayout, double> r, double theta, Constraint w = null, Constraint h = null)
 		{
 			children.Add(view,
