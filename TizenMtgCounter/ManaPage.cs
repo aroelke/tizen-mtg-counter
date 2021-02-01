@@ -14,7 +14,7 @@ namespace TizenMtgCounter
 		public const int ButtonOffset = 5;
 
 		/// <summary>
-		/// Creates a new ManaPage.
+		/// Creates a new <c>ManaPage</c>.
 		/// The page will be populated with a button for each of the six types of mana to track the amount of that mana in the mana pool
 		/// with an initial amount of 0 for each one.
 		/// </summary>

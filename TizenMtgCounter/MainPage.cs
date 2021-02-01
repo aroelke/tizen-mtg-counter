@@ -7,6 +7,10 @@ using Xamarin.Forms;
 
 namespace TizenMtgCounter
 {
+	/// <summary>
+	/// Main page of the application.  Tracks life amount and poison counters and contains buttons to change to
+	/// other pages to track other information.
+	/// </summary>
 	public class MainPage : CounterPage<int>
 	{
 		private const int LIFE = 1;
@@ -14,6 +18,12 @@ namespace TizenMtgCounter
 
 		private readonly HistoryPage history;
 
+		/// <summary>
+		/// Creates a new <c>MainPage</c>.
+		/// The initial value of the life counter is determined by <see cref="HistoryPage.StartingLife"/> and the initial number of
+		/// poison counters is 0.
+		/// </summary>
+		/// <param name="h"><see cref="HistoryPage"/> to go to for tracking life history.</param>
 		public MainPage(HistoryPage h) : base(() => new Dictionary<int, CounterData>() {
 			[LIFE] = new CounterData { Value = h.StartingLife, Thresholds = { (5, Color.Red), (10, Color.Orange) } },
 			[POISON] = new CounterData { Value = 0, Minimum = 0, Thresholds = { (9, Color.Default), (int.MaxValue, Color.Red) } }
